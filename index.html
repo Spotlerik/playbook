@@ -146,20 +146,6 @@
           </div>
         </div>
 
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:var(--space-3); margin-bottom:var(--space-6);">
-          <sc-for list="{{ quickActions }}" as="qa" hint-placeholder-count="4">
-            <div onClick="{{ qa.onClick }}" style-hover="border-color:var(--cyan); box-shadow:var(--shadow-md);" style="display:flex; align-items:center; gap:12px; padding:14px 16px; background:#fff; border:1.5px solid var(--border); border-radius:var(--radius-lg); cursor:pointer; transition:box-shadow var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out);">
-              <div style="width:36px; height:36px; border-radius:var(--radius-md); background:var(--cyan-tint); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                <span ref="{{ qa.iconRef }}" style="display:inline-flex; width:17px; height:17px; color:var(--cyan-shade); flex-shrink:0;"></span>
-              </div>
-              <div style="min-width:0;">
-                <div style="font-size:13px; font-weight:800; color:var(--navy); white-space:nowrap;">{{ qa.title }}</div>
-                <div style="font-size:11.5px; color:var(--fg3); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ qa.sub }}</div>
-              </div>
-            </div>
-          </sc-for>
-        </div>
-
         <div style="margin-bottom:var(--space-7);">
           <div style="font-size:12px; font-weight:700; letter-spacing:var(--tracking-caption); text-transform:uppercase; color:var(--fg3); margin-bottom:var(--space-3);">{{ t_funnelTitle }}</div>
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:var(--space-4);">
@@ -176,25 +162,6 @@
                 </div>
                 <div style="font-size:11px; color:var(--fg3); margin-top:7px;">{{ t_team }} {{ tile.teamPctLabel }}</div>
               </x-import>
-            </sc-for>
-          </div>
-        </div>
-
-        <div style="margin-bottom:var(--space-7);">
-          <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:var(--space-3); flex-wrap:wrap; gap:var(--space-2);">
-            <div style="font-size:12px; font-weight:700; letter-spacing:var(--tracking-caption); text-transform:uppercase; color:var(--fg3);">{{ t_pipelineHealthTitle }}</div>
-            <div style="font-size:11px; color:var(--fg3);">{{ t_pipelineHealthNote }}</div>
-          </div>
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:var(--space-4);">
-            <sc-for list="{{ pipelineHealth }}" as="ph" hint-placeholder-count="4">
-              <div style="background:#fff; border:1px solid var(--border); border-top:3px solid {{ ph.color }}; border-radius:var(--radius-md); padding:14px 16px; box-shadow:var(--shadow-sm);">
-                <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
-                  <span ref="{{ ph.iconRef }}" style="display:inline-flex; width:13px; height:13px; color:{{ ph.color }}; flex-shrink:0;"></span>
-                  <span style="font-size:11.5px; font-weight:700; color:var(--fg2);">{{ ph.label }}</span>
-                </div>
-                <div style="font-family:var(--font-display); font-weight:800; font-size:24px; color:var(--navy); letter-spacing:var(--tracking-tight);">{{ ph.value }}</div>
-                <div style="font-size:11px; color:var(--fg3); margin-top:4px;">{{ ph.sub }}</div>
-              </div>
             </sc-for>
           </div>
         </div>
@@ -483,10 +450,98 @@
         </div>
       </sc-if>
 
-      <sc-if value="{{ isPlaceholderView }}" hint-placeholder-val="{{ false }}">
-        <div style="padding:var(--space-8) 0; display:flex; flex-direction:column; align-items:flex-start; gap:8px;">
-          <div style="font-family:var(--font-display); font-weight:800; font-size:var(--fs-h2); color:var(--navy);">{{ placeholderTitle }}</div>
-          <div style="font-size:14px; color:var(--fg3);">{{ t_notBuiltYet }}</div>
+      <sc-if value="{{ isTeamView }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:var(--space-6) 0 0; display:flex; flex-direction:column; gap:var(--space-7);">
+          <div>
+            <div style="font-family:var(--font-display); font-weight:800; font-size:var(--fs-h2); color:var(--navy);">{{ teamTitle }}</div>
+            <div style="font-size:14px; color:var(--fg3); margin-top:6px; max-width:640px;">{{ teamSubtitle }}</div>
+          </div>
+
+          <div>
+            <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:var(--space-3); flex-wrap:wrap; gap:var(--space-2);">
+              <div style="font-size:12px; font-weight:700; letter-spacing:var(--tracking-caption); text-transform:uppercase; color:var(--fg3);">{{ teamHealthTitle }}</div>
+              <div style="font-size:11px; color:var(--fg3); max-width:440px; text-align:right;">{{ teamHealthNote }}</div>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:var(--space-4);">
+              <sc-for list="{{ teamHealthTiles }}" as="ph" hint-placeholder-count="4">
+                <div style="background:#fff; border:1px solid var(--border); border-top:3px solid {{ ph.color }}; border-radius:var(--radius-md); padding:16px 18px; box-shadow:var(--shadow-sm); display:flex; flex-direction:column; gap:9px;">
+                  <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                    <div style="display:flex; align-items:center; gap:6px; min-width:0;">
+                      <span ref="{{ ph.iconRef }}" style="display:inline-flex; width:13px; height:13px; color:{{ ph.color }}; flex-shrink:0;"></span>
+                      <span style="font-size:11.5px; font-weight:700; color:var(--fg2);">{{ ph.label }}</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:4px; font-size:10.5px; font-weight:700; color:var(--fg3); white-space:nowrap; flex-shrink:0;">
+                      <span ref="{{ ph.trendIconRef }}" style="display:inline-flex; width:12px; height:12px; flex-shrink:0;"></span>{{ ph.trendLabel }}
+                    </div>
+                  </div>
+                  <div style="display:flex; align-items:baseline; gap:8px;">
+                    <span style="font-family:var(--font-display); font-weight:800; font-size:26px; color:var(--navy); letter-spacing:var(--tracking-tight);">{{ ph.value }}</span>
+                    <span style="font-size:11px; color:var(--fg3);">{{ ph.sub }}</span>
+                  </div>
+                  <div style="display:flex; gap:8px; align-items:flex-start; background:var(--cyan-tint); border-radius:var(--radius-sm); padding:9px 11px;">
+                    <span style="font-size:9.5px; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; color:var(--cyan-shade); flex-shrink:0; margin-top:2px;">{{ teamDiscussLabel }}</span>
+                    <span style="font-size:12px; color:var(--navy); line-height:1.5;">{{ ph.prompt }}</span>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div>
+            <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:var(--space-3); flex-wrap:wrap; gap:var(--space-2);">
+              <div style="font-size:12px; font-weight:700; letter-spacing:var(--tracking-caption); text-transform:uppercase; color:var(--fg3);">{{ teamBoardsTitle }}</div>
+              <div style="font-size:11px; color:var(--fg3);">{{ teamBoardsNote }}</div>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:var(--space-4);">
+              <sc-for list="{{ teamBoards }}" as="board" hint-placeholder-count="4">
+                <div style="background:#fff; border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); display:flex; flex-direction:column; overflow:hidden;">
+                  <div style="padding:14px var(--space-4) 10px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:10px;">
+                    <div style="min-width:0;">
+                      <div style="font-family:var(--font-display); font-weight:800; font-size:14.5px; color:var(--navy);">{{ board.title }}</div>
+                      <div style="font-size:11.5px; color:var(--fg3); margin-top:2px;">{{ board.subLabel }}</div>
+                    </div>
+                    <span ref="{{ trophyIconRef }}" style="display:inline-flex; width:15px; height:15px; color:var(--cyan-shade); flex-shrink:0;"></span>
+                  </div>
+                  <div style="padding:6px var(--space-3);">
+                    <sc-for list="{{ board.leaderboard }}" as="row" hint-placeholder-count="14">
+                      <div style="display:flex; align-items:center; gap:10px; padding:5px 10px; border-radius:var(--radius-sm); background:{{ row.rowBg }};">
+                        <span style="width:16px; font-size:11px; font-weight:700; color:var(--fg3); flex-shrink:0;">{{ row.rank }}</span>
+                        <sc-if value="{{ row.isNamed }}" hint-placeholder-val="{{ true }}">
+                          <span style="flex:1; font-size:13px; font-weight:{{ row.nameWeight }}; color:var(--navy);">{{ row.name }}</span>
+                        </sc-if>
+                        <sc-if value="{{ row.isMasked }}" hint-placeholder-val="{{ false }}">
+                          <span style="flex:1; display:flex;"><span style="display:inline-block; height:9px; width:{{ row.maskWidth }}; background:var(--grey-200); border-radius:2px;"></span></span>
+                        </sc-if>
+                        <sc-if value="{{ row.isViewer }}" hint-placeholder-val="{{ false }}">
+                          <x-import component-from-global-scope="SpotlerDesignSystem_b204cb.Badge" tone="active" hint-size="34px,18px">{{ t_you }}</x-import>
+                        </sc-if>
+                        <span style="font-size:12px; font-weight:700; color:var(--fg2); flex-shrink:0; min-width:68px; text-align:right; white-space:nowrap;">{{ row.countLabel }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div style="padding:9px var(--space-4); border-top:1px solid var(--border); background:var(--off-white);">
+                    <span style="font-size:10.5px; color:var(--fg3); line-height:1.4;">{{ t_leaderboardFooter }}</span>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="background:var(--navy); border-radius:var(--radius-lg); padding:14px var(--space-5); display:flex; align-items:center; gap:var(--space-4); flex-wrap:wrap;">
+            <div style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
+              <div style="width:30px; height:30px; border-radius:50%; background:var(--cyan); color:var(--navy); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; font-family:var(--font-display);">{{ viewerInitials }}</div>
+              <div style="font-size:12.5px; font-weight:800; color:#fff; white-space:nowrap;">{{ teamPositionTitle }}</div>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; flex:1;">
+              <sc-for list="{{ teamPosition }}" as="pos" hint-placeholder-count="4">
+                <div style="display:flex; align-items:center; gap:7px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.16); border-radius:var(--radius-pill); padding:5px 12px;">
+                  <span style="font-size:11px; color:rgba(255,255,255,0.7);">{{ pos.signal }}</span>
+                  <span style="font-size:12px; font-weight:800; color:var(--cyan);">{{ pos.rankLabel }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="font-size:10.5px; color:rgba(255,255,255,0.5); max-width:220px;">{{ teamPositionNote }}</div>
+          </div>
         </div>
       </sc-if>
 
@@ -605,12 +660,10 @@
   <sc-if value="{{ isDemoStudioView }}" hint-placeholder-val="{{ false }}">
     <div style="position:fixed; top:0; right:0; bottom:0; left:{{ demoStudioLeftInset }}; z-index:500; background:#fff; transition: left 0.22s var(--ease-out, ease);">
       <iframe key="{{ demoStudioKey }}" src="demo-studio/index.html?fresh=1" title="Demo Studio" style="width:100%; height:100%; border:none; display:block;"></iframe>
-      <sc-if value="{{ demoStudioFullscreen }}" hint-placeholder-val="{{ false }}">
-        <button onClick="{{ onExitDemoStudio }}" style-hover="background:rgba(0,42,77,0.85);" style="position:absolute; top:16px; right:16px; z-index:501; display:flex; align-items:center; gap:6px; padding:8px 14px; border:none; border-radius:var(--radius-pill); background:rgba(0,42,77,0.55); backdrop-filter:blur(8px); color:#fff; font-family:var(--font-body); font-size:12.5px; font-weight:700; cursor:pointer;">
-          <span ref="{{ exitIconRef }}" style="display:inline-flex; width:13px; height:13px; flex-shrink:0;"></span>
-          {{ t_exitDemoStudio }}
-        </button>
-      </sc-if>
+      <button onClick="{{ onExitDemoStudio }}" style-hover="background:rgba(0,42,77,0.95);" style="position:absolute; top:16px; right:16px; z-index:501; display:flex; align-items:center; gap:6px; padding:8px 14px; border:none; border-radius:var(--radius-pill); background:rgba(0,42,77,0.78); backdrop-filter:blur(8px); box-shadow:var(--shadow-md); color:#fff; font-family:var(--font-body); font-size:12.5px; font-weight:700; cursor:pointer;">
+        <span ref="{{ exitIconRef }}" style="display:inline-flex; width:13px; height:13px; flex-shrink:0;"></span>
+        {{ t_exitDemoStudio }}
+      </button>
     </div>
   </sc-if>
 </div>
@@ -689,19 +742,21 @@ const I18N = {
     programDay: (w, d, len) => `week ${w}, dag ${d} van ${len}`,
     streakLabel: (n) => `${n}-${n === 1 ? 'week' : 'weken'} streak`,
     navProducts: 'Producten',
-    quickActions: [
-      { icon: 'search', title: 'Nieuwe lead binnen?', sub: 'Bekijk het opvolgprotocol per bron', stageId: 'prospecting' },
-      { icon: 'filter', title: 'Klaar om te kwalificeren?', sub: 'Open de discovery- en pijnscripts', stageId: 'qualifying' },
-      { icon: 'presentation', title: 'Demo inplannen?', sub: 'Pak het kwalificatiescript en de demo-links', stageId: 'demoing' },
-      { icon: 'file-check', title: 'Deal aan het sluiten?', sub: 'Open de prijsgids en closing scripts', stageId: 'proposing' },
-    ],
     pipelineHealthTitle: 'Pipeline-gezondheid — team', pipelineHealthNote: 'Vaste analyse, Commercial Team NL · niet gekoppeld aan de periodekeuze hierboven.',
     pipelineHealth: [
-      { icon: 'trending-up', label: 'Win rate Partner', value: '88%', sub: 'Hoogste ROI — gem. €8.978/deal', tone: 'success' },
-      { icon: 'trending-down', label: 'Win rate Marketing', value: '15%', sub: 'Snelle opvolging is cruciaal', tone: 'warning' },
-      { icon: 'alert-triangle', label: 'Stuck deals >60d', value: '84', sub: "€1,03M vervuilde forecast", tone: 'danger' },
-      { icon: 'euro', label: 'MRR ontbreekt', value: '45%', sub: 'Deals zonder productline item', tone: 'info' },
+      { icon: 'trending-up', label: 'Win rate Partner', value: '88%', sub: 'Hoogste ROI — gem. €8.978/deal', tone: 'success', trendIcon: 'trending-up', trendLabel: '+3pt t.o.v. vorige week', prompt: 'Waarom winnen we hier zo vaak? Wat kunnen we kopiëren naar de zwakkere bronnen?' },
+      { icon: 'trending-down', label: 'Win rate Marketing', value: '15%', sub: 'Snelle opvolging is cruciaal', tone: 'warning', trendIcon: 'trending-down', trendLabel: '-2pt t.o.v. vorige week', prompt: 'Waar lekt het? Check de opvolgsnelheid en de kwalificatie vóór de demo.' },
+      { icon: 'alert-triangle', label: 'Stuck deals >60d', value: '84', sub: "€1,03M vervuilde forecast", tone: 'danger', trendIcon: 'trending-up', trendLabel: '+11 t.o.v. vorige week', prompt: 'Welke deals precies? Deze week opschonen of heractiveren.' },
+      { icon: 'euro', label: 'MRR ontbreekt', value: '45%', sub: 'Deals zonder productline item', tone: 'info', trendIcon: 'minus', trendLabel: 'gelijk t.o.v. vorige week', prompt: 'Vul het product aan bij het aanmaken — zonder productline item geen dealwaarde.' },
     ],
+    teamSubtitle: 'De gedeelde stand van zaken — de basis voor de wekelijkse teammeeting.',
+    teamHealthTitle: 'Pipeline-gezondheid — teammeeting',
+    teamHealthNote: 'Vaste analyse, Commercial Team NL. Elke tegel is een gespreksstarter: eerst de stand, dan het waarom.',
+    teamDiscussLabel: 'Bespreken',
+    teamBoardsTitle: 'Ranglijsten per signaal',
+    teamBoardsNote: 'Wie converteert, wie lekt — per coachingsignaal.',
+    teamPositionTitle: 'Jouw positie',
+    teamPositionNote: 'Alleen ter oriëntatie. Je persoonlijke dashboard staat op Home.',
     admin: {
       title: 'Admin', sub: 'Lead-routing, producteigenaarschap en toewijzingslogica — referentie voor beheerders.',
       routingTitle: 'Automatische leadtoewijzing — volledig schema', routingBadge: 'Stap 0 + 2 + fallback + priority = NL',
@@ -902,19 +957,21 @@ const I18N = {
     programDay: (w, d, len) => `week ${w}, day ${d} of ${len}`,
     streakLabel: (n) => `${n}-week streak`,
     navProducts: 'Products',
-    quickActions: [
-      { icon: 'search', title: 'New lead in?', sub: 'Open the follow-up protocol per source', stageId: 'prospecting' },
-      { icon: 'filter', title: 'Ready to qualify?', sub: 'Open the discovery and pain scripts', stageId: 'qualifying' },
-      { icon: 'presentation', title: 'Booking a demo?', sub: 'Grab the qualification script and demo links', stageId: 'demoing' },
-      { icon: 'file-check', title: 'Closing a deal?', sub: 'Open the pricing guide and closing scripts', stageId: 'proposing' },
-    ],
     pipelineHealthTitle: 'Pipeline health — team', pipelineHealthNote: 'Fixed analysis, Commercial Team NL · not tied to the period selector above.',
     pipelineHealth: [
-      { icon: 'trending-up', label: 'Win rate Partner', value: '88%', sub: 'Highest ROI — avg €8,978/deal', tone: 'success' },
-      { icon: 'trending-down', label: 'Win rate Marketing', value: '15%', sub: 'Fast follow-up is critical', tone: 'warning' },
-      { icon: 'alert-triangle', label: 'Stuck deals >60d', value: '84', sub: '€1.03M polluted forecast', tone: 'danger' },
-      { icon: 'euro', label: 'MRR missing', value: '45%', sub: 'Deals missing a product line item', tone: 'info' },
+      { icon: 'trending-up', label: 'Win rate Partner', value: '88%', sub: 'Highest ROI — avg €8,978/deal', tone: 'success', trendIcon: 'trending-up', trendLabel: '+3pt vs last week', prompt: 'Why do we win here so often? What can we copy to the weaker sources?' },
+      { icon: 'trending-down', label: 'Win rate Marketing', value: '15%', sub: 'Fast follow-up is critical', tone: 'warning', trendIcon: 'trending-down', trendLabel: '-2pt vs last week', prompt: 'Where is it leaking? Check follow-up speed and pre-demo qualification.' },
+      { icon: 'alert-triangle', label: 'Stuck deals >60d', value: '84', sub: '€1.03M polluted forecast', tone: 'danger', trendIcon: 'trending-up', trendLabel: '+11 vs last week', prompt: 'Which deals exactly? Clean them up or re-activate them this week.' },
+      { icon: 'euro', label: 'MRR missing', value: '45%', sub: 'Deals missing a product line item', tone: 'info', trendIcon: 'minus', trendLabel: 'flat vs last week', prompt: 'Fill in the product on creation — no line item means no deal value.' },
     ],
+    teamSubtitle: 'The shared state of play — the base for the weekly team meeting.',
+    teamHealthTitle: 'Pipeline health — team meeting',
+    teamHealthNote: 'Fixed analysis, Commercial Team NL. Each tile is a discussion starter: the state first, then the why.',
+    teamDiscussLabel: 'Discuss',
+    teamBoardsTitle: 'Leaderboards by signal',
+    teamBoardsNote: 'Who is converting, who is leaking — per coaching signal.',
+    teamPositionTitle: 'Your position',
+    teamPositionNote: 'For orientation only. Your personal dashboard lives on Home.',
     admin: {
       title: 'Admin', sub: 'Lead routing, product ownership and assignment logic — reference for admins.',
       routingTitle: 'Automatic lead assignment — full schema', routingBadge: 'Step 0 + 2 + fallback + priority = NL',
@@ -1177,9 +1234,8 @@ class Component extends DCLogic {
     const productsFg = productsActive ? '#ffffff' : 'rgba(255,255,255,0.8)';
     const isAdminView = productsActive;
     const goStage = (stageId) => this.setState({ view: 'stage', activeStage: stageId, toolkitExpanded: true });
-    const quickActions = T.quickActions.map((q) => ({ title: q.title, sub: q.sub, iconRef: this.getIconRef(q.icon, 18), onClick: () => goStage(q.stageId) }));
     const toneColors = { success: 'var(--success)', warning: 'var(--warning)', danger: 'var(--danger)', info: 'var(--cyan-shade)' };
-    const pipelineHealth = T.pipelineHealth.map((p) => ({ label: p.label, value: p.value, sub: p.sub, color: toneColors[p.tone] || 'var(--fg2)', iconRef: this.getIconRef(p.icon, 15) }));
+    const pipelineHealth = T.pipelineHealth.map((p) => ({ label: p.label, value: p.value, sub: p.sub, color: toneColors[p.tone] || 'var(--fg2)', iconRef: this.getIconRef(p.icon, 15), trendIconRef: this.getIconRef(p.trendIcon, 12), trendLabel: p.trendLabel, prompt: p.prompt }));
     const ownerRows = OWNER_ROWS.map((r, i) => ({ product: r.product, owner: r.owner, hasOwner: r.hasOwner, noOwner: !r.hasOwner, rowBg: i % 2 === 1 ? 'var(--cyan-tint)' : 'transparent' }));
 
     if (!mod) {
@@ -1200,14 +1256,15 @@ class Component extends DCLogic {
         businessRules, t_rulesTitle, owner, contacts, onOpenHelp, isHelpView,
         t_closedLostTitle: T.closedLostTitle, closedLostReasons: T.closedLostReasons, t_closedLostNote: T.closedLostNote,
         t_contactsTitle: T.contactsTitle, t_contactsFooter: T.contactsFooter,
-        isHomeView: true, isToolkitView: false, isStageView: false, isUsecasesView: false, isPlaceholderView: false,
+        isHomeView: true, isToolkitView: false, isStageView: false, isUsecasesView: false, isTeamView: false,
+        teamTitle: T.navTeam, teamSubtitle: T.teamSubtitle, teamHealthTitle: T.teamHealthTitle, teamHealthNote: T.teamHealthNote, teamDiscussLabel: T.teamDiscussLabel, teamBoardsTitle: T.teamBoardsTitle, teamBoardsNote: T.teamBoardsNote, teamPositionTitle: T.teamPositionTitle, teamPositionNote: T.teamPositionNote, teamHealthTiles: pipelineHealth, teamBoards: [], teamPosition: [],
         showViewerSwitcher: true, useCaseMountRef: this.mountUseCases,
-        stageCards: [], activeStageData: { title: '', blurb: '', items: [] }, toolkitTags: [], placeholderTitle: '',
+        stageCards: [], activeStageData: { title: '', blurb: '', items: [] }, toolkitTags: [],
         onBackToToolkit: () => this.setState({ view: 'toolkit' }),
         t_toolkitTitle: T.toolkitTitle, t_toolkitSub: T.toolkitSub, t_searchPlaceholder: T.searchPlaceholder,
         t_backToToolkit: T.backToToolkit, t_comingSoon: T.comingSoon, t_notBuiltYet: T.notBuiltYet,
         productsIconRef, onOpenAdmin, productsBg, productsBorder, productsFg, productsJustify, t_navProducts: T.navProducts,
-        isAdminView, quickActions, pipelineHealth, t_pipelineHealthTitle: T.pipelineHealthTitle, t_pipelineHealthNote: T.pipelineHealthNote,
+        isAdminView, pipelineHealth, t_pipelineHealthTitle: T.pipelineHealthTitle, t_pipelineHealthNote: T.pipelineHealthNote,
         t_adminTitle: T.admin.title, t_adminSub: T.admin.sub, t_routingTitle: T.admin.routingTitle, t_routingBadge: T.admin.routingBadge, t_routingCaption: T.admin.routingCaption,
         routingSteps: T.admin.routingSteps, t_fallbackTitle: T.admin.fallbackTitle, t_fallbackText: T.admin.fallbackText, t_priorityTitle: T.admin.priorityTitle, t_priorityText: T.admin.priorityText,
         t_ownerTableTitle: T.admin.ownerTableTitle, t_ownerColProduct: T.admin.ownerColProduct, t_ownerColOwner: T.admin.ownerColOwner, t_noOwnerBadge: T.admin.noOwnerBadge, t_ownerComboNote: T.admin.ownerComboNote, ownerRows,
@@ -1346,6 +1403,15 @@ class Component extends DCLogic {
       };
     });
 
+    // Team page (b + c): reuse the panel leaderboards full-strength, and locate the viewer.
+    const teamBoards = panels.map((p) => ({ title: p.title, subLabel: p.subLabel, leaderboard: p.leaderboard }));
+    const teamPosition = panels.map((p) => {
+      const me = p.leaderboard.find((r) => r.isViewer);
+      const n = p.leaderboard.length;
+      const rank = me ? me.rank : n;
+      return { signal: p.title, rankLabel: lang === 'nl' ? `#${rank} van ${n}` : `#${rank} of ${n}` };
+    });
+
     const rawActiveStage = stages.find((s) => s.id === this.state.activeStage) || stages[0];
     const activeStageData = Object.assign({}, rawActiveStage, {
       richItems: (rawActiveStage.richItems || []).map((rich) => {
@@ -1421,9 +1487,9 @@ class Component extends DCLogic {
       isToolkitView: view === 'toolkit',
       isStageView: view === 'stage',
       isUsecasesView: view === 'usecases',
-      isPlaceholderView: view === 'team',
+      isTeamView: view === 'team',
       showViewerSwitcher: view !== 'usecases' && view !== 'admin', useCaseMountRef: this.mountUseCases,
-      placeholderTitle: T.navTeam,
+      teamTitle: T.navTeam, teamSubtitle: T.teamSubtitle, teamHealthTitle: T.teamHealthTitle, teamHealthNote: T.teamHealthNote, teamDiscussLabel: T.teamDiscussLabel, teamBoardsTitle: T.teamBoardsTitle, teamBoardsNote: T.teamBoardsNote, teamPositionTitle: T.teamPositionTitle, teamPositionNote: T.teamPositionNote, teamHealthTiles: pipelineHealth, teamBoards, teamPosition,
       stageCards: stages.map((s) => ({ icon: s.icon, iconRef: this.getIconRef(s.icon, 19), title: s.title, blurb: s.blurb, onClick: () => goStage(s.id) })),
       activeStageData,
       toolkitTags: stages.map((s) => s.title),
@@ -1435,7 +1501,7 @@ class Component extends DCLogic {
       t_comingSoon: T.comingSoon,
       t_notBuiltYet: T.notBuiltYet,
       productsIconRef, onOpenAdmin, productsBg, productsBorder, productsFg, productsJustify, t_navProducts: T.navProducts,
-      isAdminView, quickActions, pipelineHealth, t_pipelineHealthTitle: T.pipelineHealthTitle, t_pipelineHealthNote: T.pipelineHealthNote,
+      isAdminView, pipelineHealth, t_pipelineHealthTitle: T.pipelineHealthTitle, t_pipelineHealthNote: T.pipelineHealthNote,
       t_adminTitle: T.admin.title, t_adminSub: T.admin.sub, t_routingTitle: T.admin.routingTitle, t_routingBadge: T.admin.routingBadge, t_routingCaption: T.admin.routingCaption,
       routingSteps: T.admin.routingSteps, t_fallbackTitle: T.admin.fallbackTitle, t_fallbackText: T.admin.fallbackText, t_priorityTitle: T.admin.priorityTitle, t_priorityText: T.admin.priorityText,
       t_ownerTableTitle: T.admin.ownerTableTitle, t_ownerColProduct: T.admin.ownerColProduct, t_ownerColOwner: T.admin.ownerColOwner, t_noOwnerBadge: T.admin.noOwnerBadge, t_ownerComboNote: T.admin.ownerComboNote, ownerRows,
