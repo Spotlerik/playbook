@@ -701,6 +701,10 @@
         <span ref="{{ exitIconRef }}" style="display:inline-flex; width:13px; height:13px; flex-shrink:0;"></span>
         {{ t_exitDemoStudio }}
       </button>
+      <div style="position:absolute; bottom:16px; left:16px; z-index:501; display:flex; align-items:center; gap:6px; padding:6px 12px; border-radius:var(--radius-pill); background:rgba(0,42,77,0.62); backdrop-filter:blur(8px); box-shadow:var(--shadow-sm); color:rgba(255,255,255,0.92); font-family:var(--font-body); font-size:11px; font-weight:700; pointer-events:none;">
+        <span ref="{{ infoIconRef }}" style="display:inline-flex; width:12px; height:12px; flex-shrink:0;"></span>
+        {{ t_demoNoData }}
+      </div>
     </div>
   </sc-if>
 </div>
@@ -743,6 +747,7 @@ const I18N = {
     comingSoon: 'Binnenkort',
     notBuiltYet: 'Dit onderdeel is deze sessie nog niet gebouwd.',
     exitDemoStudio: 'Terug naar Playbook',
+    demoNoData: 'Demo Studio · genereert geen HubSpot-data',
     rulesTitle: 'Belangrijke regels',
     rules: [
       { badgeLabel: 'Verplicht', title: 'Cross-sell leadverdeling', desc: 'Bij een cross-sell lead die wordt overgedragen en wint, gaat 25% van de deal naar de collega die de lead heeft aangedragen. De sales die de lead oppakt en sluit, ontvangt de resterende 75%.' },
@@ -965,6 +970,7 @@ const I18N = {
     comingSoon: 'Coming soon',
     notBuiltYet: 'This section is not built yet this session.',
     exitDemoStudio: 'Back to Playbook',
+    demoNoData: 'Demo Studio · generates no HubSpot data',
     rulesTitle: 'Key rules',
     rules: [
       { badgeLabel: 'Mandatory', title: 'Cross-sell lead split', desc: 'When a cross-sell lead is handed over and the deal is won, 25% of the deal goes to the colleague who brought in the lead. The rep who picks up and closes the lead receives the remaining 75%.' },
@@ -1273,6 +1279,7 @@ class Component extends DCLogic {
     const arrowLeftIconRef = this.getIconRef('arrow-left', 14);
     const fileTextIconRef = this.getIconRef('file-text', 16);
     const exitIconRef = this.getIconRef('x', 13);
+    const infoIconRef = this.getIconRef('info', 12);
     const productsActive = this.state.view === 'admin';
     const productsJustify = collapsed ? 'center' : 'flex-start';
     const productsIconRef = this.getIconRef('package', 14);
@@ -1299,7 +1306,7 @@ class Component extends DCLogic {
         onSetLangEn: () => this.setState({ lang: 'en' }, () => this.syncUseCaseLang()),
         onChangeViewer: () => {},
         sidebarWidth, collapseIcon, onToggleCollapse, sidebarExpanded, t_repRole: T.repRole,
-        collapseIconRef, powerIconRef, sparklesIconRef, flameIconRef, clockIconRef, arrowRightIconRef, trophyIconRef, arrowLeftIconRef, fileTextIconRef, exitIconRef,
+        collapseIconRef, powerIconRef, sparklesIconRef, flameIconRef, clockIconRef, arrowRightIconRef, trophyIconRef, arrowLeftIconRef, fileTextIconRef, exitIconRef, infoIconRef, t_demoNoData: T.demoNoData,
         isDemoStudioView: false, demoStudioKey: 0, demoStudioFullscreen: false, demoStudioLeftInset: '230px', onExitDemoStudio: () => this.setState({ view: 'home', demoStudioFullscreen: false }), t_exitDemoStudio: T.exitDemoStudio,
         businessRules, t_rulesTitle, owner, contacts, onOpenHelp, isHelpView,
         t_closedLostTitle: T.closedLostTitle, closedLostReasons: T.closedLostReasons, t_closedLostNote: T.closedLostNote,
@@ -1530,7 +1537,7 @@ class Component extends DCLogic {
     return {
       navRows,
       sidebarWidth, collapseIcon, onToggleCollapse, sidebarExpanded,
-      collapseIconRef, powerIconRef, sparklesIconRef, flameIconRef, clockIconRef, arrowRightIconRef, trophyIconRef, arrowLeftIconRef, fileTextIconRef, exitIconRef,
+      collapseIconRef, powerIconRef, sparklesIconRef, flameIconRef, clockIconRef, arrowRightIconRef, trophyIconRef, arrowLeftIconRef, fileTextIconRef, exitIconRef, infoIconRef, t_demoNoData: T.demoNoData,
       isDemoStudioView: view === 'demo', demoStudioKey: this.state.demoStudioKey || 0,
       demoStudioFullscreen: this.state.demoStudioFullscreen,
       demoStudioLeftInset: this.state.demoStudioFullscreen ? '0' : sidebarWidth,
