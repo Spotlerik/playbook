@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spotler Demo Studio</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      background: linear-gradient(180deg, #0d3f63 0%, #002a4d 60%, #001d34 100%);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 24px;
+      font-family: 'Open Sans', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .card {
+      max-width: 520px; text-align: center;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 20px; padding: 40px 36px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+    }
+    .badge {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: #f0e306; color: #002a4d;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px; font-size: 30px; font-weight: 800;
+    }
+    h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 10px; }
+    h1 .accent { color: #23afe6; }
+    p { font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.82); margin-bottom: 14px; }
+    .note {
+      font-size: 12.5px; line-height: 1.6; color: rgba(255,255,255,0.6);
+      background: rgba(0,0,0,0.18); border-radius: 12px; padding: 14px 16px; text-align: left;
+    }
+    code { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; color: #8ec8ed; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="badge">S</div>
+    <h1>spotler<span class="accent">demo studio</span></h1>
+    <p>The interactive sales demo tool sits here inside the Coaching Hub.</p>
+    <div class="note">
+      This is a placeholder. The full Demo Studio bundle is a single self-contained
+      HTML app that exceeds the 256&nbsp;KB per-file limit of the design import tool,
+      so it could not be copied across automatically. Export it from the Claude Design
+      project (<code>demo-studio/index.html</code>) and drop it in at this path to
+      restore the live tool — every other part of the Coaching Hub works without it.
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/spotler-design-system-b204cbf5-2f1f-4e6a-a470-68b2b55e29aa/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/spotler-design-system-b204cbf5-2f1f-4e6a-a470-68b2b55e29aa/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/spotler-design-system-b204cbf5-2f1f-4e6a-a470-68b2b55e29aa/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/spotler-design-system-b204cbf5-2f1f-4e6a-a470-68b2b55e29aa/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/spotler-design-system-b204cbf5-2f1f-4e6a-a470-68b2b55e29aa/tokens/motion.css">
+  <link rel="stylesheet" href="_ds/spotler-design-system-b204cbf5-2f1f-4e6a-a470-68b2b55e29aa/tokens/base.css">
+  <link rel="stylesheet" href="_ds/spotler-design-system-b204cbf5-2f1f-4e6a-a470-68b2b55e29aa/styles.css">
+  <script src="_ds/spotler-design-system-b204cbf5-2f1f-4e6a-a470-68b2b55e29aa/_ds_bundle.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="usecases/uc-mockups.js"></script>
+  <script src="usecases/strings_nl.js"></script>
+  <script src="usecases/use_cases.js"></script>
+  <script src="usecases/app.js"></script>
+  <style>
+    body { margin: 0; }
+    @keyframes cx-lb-fade { from { opacity: 0; } to { opacity: 1; } }
+  </style>
+</helmet>
+<div data-screen-label="Coaching Hub" style="min-height:100vh; display:flex; background:var(--off-white); font-family:var(--font-body); color:var(--fg1);">
+  <div style="width:{{ sidebarWidth }}; flex-shrink:0; background:linear-gradient(180deg, color-mix(in oklch, var(--navy), white 14%) 0%, var(--navy) 45%, var(--navy-shade) 100%); display:flex; flex-direction:column; box-sizing:border-box; transition:width var(--dur) var(--ease-out); overflow:hidden;">
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:var(--space-4);">
+      <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+        <div style="display:grid; grid-template-columns:3px 3px 3px; grid-template-rows:3px 3px 3px; gap:2px; flex-shrink:0;">
+          <span style="width:3px; height:3px; border-radius:50%; background:rgba(255,255,255,0.55);"></span>
+          <span style="width:3px; height:3px; border-radius:50%; background:rgba(255,255,255,0.55);"></span>
+          <span style="width:3px; height:3px; border-radius:50%; background:rgba(255,255,255,0.55);"></span>
+          <span style="width:3px; height:3px; border-radius:50%; background:rgba(255,255,255,0.55);"></span>
+          <span style="width:3px; height:3px; border-radius:50%; background:rgba(255,255,255,0.55);"></span>
+          <span style="width:3px; height:3px; border-radius:50%; background:rgba(255,255,255,0.55);"></span>
+          <span style="width:3px; height:3px; border-radius:50%; background:rgba(255,255,255,0.55);"></span>
+          <span style="width:3px; height:3px; border-radius:50%; background:rgba(255,255,255,0.55);"></span>
+          <span style="width:3px; height:3px; border-radius:50%; background:rgba(255,255,255,0.55);"></span>
+        </div>
+        <sc-if value="{{ sidebarExpanded }}" hint-placeholder-val="{{ true }}">
+          <div style="font-family:var(--font-display); font-weight:800; font-size:16px; letter-spacing:var(--tracking-tight); white-space:nowrap;">
+            <span style="color:#fff;">spotler</span><span style="color:var(--cyan);">playbook</span>
+          </div>
+        </sc-if>
+      </div>
+      <button onClick="{{ onToggleCollapse }}" style-hover="background:rgba(255,255,255,0.14);" style="width:22px; height:22px; border-radius:50%; border:1px solid rgba(255,255,255,0.25); background:transparent; color:rgba(255,255,255,0.7); display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; padding:0;">
+        <span ref="{{ collapseIconRef }}" style="display:inline-flex; width:12px; height:12px; flex-shrink:0;"></span>
+      </button>
+    </div>
+
+    <div style="flex:1; overflow-y:auto; padding:var(--space-2) var(--space-3) 0; display:flex; flex-direction:column; gap:3px;">
+      <sc-for list="{{ navRows }}" as="row" hint-placeholder-count="6">
+        <sc-if value="{{ row.isDivider }}" hint-placeholder-val="{{ false }}">
+          <div style="height:1px; background:rgba(255,255,255,0.14); margin:var(--space-2) var(--space-2);"></div>
+        </sc-if>
+        <sc-if value="{{ row.isItem }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex; align-items:stretch; gap:2px;">
+            <div onClick="{{ row.onClick }}" style-hover="background:rgba(255,255,255,0.08);" style="flex:1; display:flex; align-items:center; justify-content:{{ row.justify }}; gap:12px; padding:{{ row.padding }}; margin-left:{{ row.indent }}; border-radius:var(--radius-md); background:{{ row.bg }}; cursor:pointer; min-width:0;">
+              <span ref="{{ row.iconRef }}" style="display:inline-flex; width:{{ row.iconSize }}; height:{{ row.iconSize }}; color:{{ row.fg }}; flex-shrink:0;"></span>
+              <sc-if value="{{ sidebarExpanded }}" hint-placeholder-val="{{ true }}">
+                <span style="font-size:{{ row.fontSize }}; font-weight:{{ row.fontWeight }}; color:{{ row.fg }}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ row.label }}</span>
+              </sc-if>
+            </div>
+            <sc-if value="{{ row.hasChevron }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ row.onChevronClick }}" style-hover="background:rgba(255,255,255,0.14);" style="width:30px; border:none; background:transparent; color:rgba(255,255,255,0.6); display:flex; align-items:center; justify-content:center; cursor:pointer; border-radius:var(--radius-md); flex-shrink:0;">
+                <span ref="{{ row.chevronIconRef }}" style="display:inline-flex; width:14px; height:14px; flex-shrink:0;"></span>
+              </button>
+            </sc-if>
+          </div>
+        </sc-if>
+      </sc-for>
+    </div>
+
+    <div style="padding:0 var(--space-3) var(--space-2);">
+      <div onClick="{{ onOpenAdmin }}" style-hover="background:rgba(255,255,255,0.14);" style="display:flex; align-items:center; justify-content:{{ productsJustify }}; gap:8px; padding:9px 14px; border-radius:var(--radius-pill); border:1px solid {{ productsBorder }}; background:{{ productsBg }}; cursor:pointer; transition:background var(--dur) var(--ease-out);">
+        <span ref="{{ productsIconRef }}" style="display:inline-flex; width:14px; height:14px; color:{{ productsFg }}; flex-shrink:0;"></span>
+        <sc-if value="{{ sidebarExpanded }}" hint-placeholder-val="{{ true }}">
+          <span style="font-size:12px; font-weight:700; color:{{ productsFg }}; white-space:nowrap;">{{ t_navProducts }}</span>
+        </sc-if>
+      </div>
+    </div>
+
+    <div style="margin-top:auto; border-top:1px solid rgba(255,255,255,0.14); padding:var(--space-3); display:flex; align-items:center; gap:10px; min-width:0;">
+      <div style="width:30px; height:30px; border-radius:50%; background:var(--cyan); color:var(--navy); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; font-family:var(--font-display); flex-shrink:0;">{{ viewerInitials }}</div>
+      <sc-if value="{{ sidebarExpanded }}" hint-placeholder-val="{{ true }}">
+        <div style="min-width:0; flex:1;">
+          <div style="font-size:12.5px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ viewerName }}</div>
+          <div style="font-size:10.5px; color:rgba(255,255,255,0.55);">{{ t_repRole }}</div>
+        </div>
+      </sc-if>
+      <span ref="{{ powerIconRef }}" style="display:inline-flex; width:15px; height:15px; color:rgba(255,255,255,0.5); flex-shrink:0;"></span>
+    </div>
+  </div>
+
+  <div style="flex:1; min-width:0; display:flex; justify-content:center;">
+    <div style="width:100%; max-width:1360px; padding:0 var(--space-7) var(--space-8); box-sizing:border-box;">
+
+      <div style="display:flex; justify-content:flex-end; align-items:flex-end; gap:var(--space-3); padding:var(--space-4) 0 0;">
+        <sc-if value="{{ showViewerSwitcher }}" hint-placeholder-val="{{ true }}">
+          <x-import component-from-global-scope="SpotlerDesignSystem_b204cb.Select" label="{{ viewingAsLabel }}" options="{{ repSelectOptions }}" value="{{ viewerId }}" onChange="{{ onChangeViewer }}" style="width:190px;" hint-size="190px,62px"></x-import>
+        </sc-if>
+        <div style="display:flex; gap:6px; padding-bottom:1px;">
+          <x-import component-from-global-scope="SpotlerDesignSystem_b204cb.Button" variant="{{ langVariant.nl }}" size="sm" onClick="{{ onSetLangNl }}" hint-size="50px,34px">NL</x-import>
+          <x-import component-from-global-scope="SpotlerDesignSystem_b204cb.Button" variant="{{ langVariant.en }}" size="sm" onClick="{{ onSetLangEn }}" hint-size="50px,34px">EN</x-import>
+        </div>
+      </div>
+
+      <sc-if value="{{ isHomeView }}" hint-placeholder-val="{{ true }}">
+        <div>
+        <div style="padding:var(--space-5) 0 var(--space-6); display:flex; flex-direction:column; gap:var(--space-5); border-bottom:1px solid var(--border); margin-bottom:var(--space-6);">
+          <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:var(--space-5);">
+            <div style="display:flex; align-items:center; gap:var(--space-4);">
+              <div style="width:56px; height:56px; border-radius:50%; background:var(--navy); color:#fff; display:flex; align-items:center; justify-content:center; font-size:19px; font-weight:800; font-family:var(--font-display); flex-shrink:0;">{{ viewerInitials }}</div>
+              <div>
+                <div style="font-family:var(--font-display); font-weight:800; font-size:var(--fs-h3); letter-spacing:var(--tracking-tight); color:var(--navy);">{{ greeting }}</div>
+                <div style="font-size:13.5px; color:var(--fg3); margin-top:2px;">{{ programDayLabel }}</div>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:var(--space-3);">
+              <div style="display:flex; align-items:center; gap:8px; background:#fff; border:1px solid var(--border); border-radius:var(--radius-pill); padding:9px 18px; box-shadow:var(--shadow-sm);">
+                <span ref="{{ sparklesIconRef }}" style="display:inline-flex; width:16px; height:16px; color:var(--cyan-shade); flex-shrink:0;"></span>
+                <span style="font-weight:800; font-size:16px; color:var(--navy);">{{ pointsValue }}</span>
+                <span style="font-size:12px; color:var(--fg3);">{{ t_points }}</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:9px; background:#fff; border:1px solid var(--border); border-radius:var(--radius-pill); padding:7px 18px 7px 10px; box-shadow:var(--shadow-sm);">
+                <x-import component-from-global-scope="SpotlerDesignSystem_b204cb.Spotlight" mode="icon" size="{{ 26 }}" hint-size="26px,26px"><span ref="{{ flameIconRef }}" style="display:inline-flex; width:14px; height:14px; color:var(--navy); flex-shrink:0;"></span></x-import>
+                <span style="font-weight:800; font-size:16px; color:var(--navy);">{{ streakLabel }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:var(--space-3);">
+            <div style="display:flex; align-items:center; gap:6px; font-size:12px; color:var(--fg3);">
+              <span ref="{{ clockIconRef }}" style="display:inline-flex; width:13px; height:13px; flex-shrink:0;"></span>
+              <span>{{ dataAsOfLabel }}</span>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <sc-for list="{{ periodOptions }}" as="p" hint-placeholder-count="3">
+                <x-import component-from-global-scope="SpotlerDesignSystem_b204cb.Button" variant="{{ p.variant }}" size="sm" onClick="{{ p.onClick }}" hint-size="96px,34px">{{ p.label }}</x-import>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:var(--space-3); margin-bottom:var(--space-6);">
+          <sc-for list="{{ quickActions }}" as="qa" hint-placeholder-count="4">
+            <div onClick="{{ qa.onClick }}" style-hover="border-color:var(--cyan); box-shadow:var(--shadow-md);" style="display:flex; align-items:center; gap:12px; padding:14px 16px; background:#fff; border:1.5px solid var(--border); border-radius:var(--radius-lg); cursor:pointer; transition:box-shadow var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out);">
+              <div style="width:36px; height:36px; border-radius:var(--radius-md); background:var(--cyan-tint); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <span ref="{{ qa.iconRef }}" style="display:inline-flex; width:17px; height:17px; color:var(--cyan-shade); flex-shrink:0;"></span>
+              </div>
+              <div style="min-width:0;">
+                <div style="font-size:13px; font-weight:800; color:var(--navy); white-space:nowrap;">{{ qa.title }}</div>
+                <div style="font-size:11.5px; color:var(--fg3); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ qa.sub }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="margin-bottom:var(--space-7);">
+          <div style="font-size:12px; font-weight:700; letter-spacing:var(--tracking-caption); text-transform:uppercase; color:var(--fg3); margin-bottom:var(--space-3);">{{ t_funnelTitle }}</div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:var(--space-4);">
+            <sc-for list="{{ funnelTiles }}" as="tile" hint-placeholder-count="4">
+              <x-import component-from-global-scope="SpotlerDesignSystem_b204cb.Card" elevation="sm" radius="lg" padding="{{ 20 }}" hint-size="100%,128px">
+                <div style="font-size:12.5px; font-weight:700; color:var(--fg2); margin-bottom:10px;">{{ tile.label }}</div>
+                <div style="display:flex; align-items:baseline; gap:7px;">
+                  <span style="font-family:var(--font-display); font-weight:800; font-size:27px; color:var(--navy); letter-spacing:var(--tracking-tight);">{{ tile.youPctLabel }}</span>
+                  <span style="font-size:12px; color:var(--fg3);">{{ t_you }}</span>
+                </div>
+                <div style="height:5px; background:var(--grey-100); border-radius:var(--radius-pill); position:relative; overflow:hidden; margin-top:10px;">
+                  <div style="position:absolute; inset:0; border-radius:var(--radius-pill); background:var(--grey-300); width:{{ tile.teamBarWidth }};"></div>
+                  <div style="position:absolute; inset:0; border-radius:var(--radius-pill); background:var(--cyan); width:{{ tile.youBarWidth }};"></div>
+                </div>
+                <div style="font-size:11px; color:var(--fg3); margin-top:7px;">{{ t_team }} {{ tile.teamPctLabel }}</div>
+              </x-import>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="margin-bottom:var(--space-7);">
+          <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:var(--space-3); flex-wrap:wrap; gap:var(--space-2);">
+            <div style="font-size:12px; font-weight:700; letter-spacing:var(--tracking-caption); text-transform:uppercase; color:var(--fg3);">{{ t_pipelineHealthTitle }}</div>
+            <div style="font-size:11px; color:var(--fg3);">{{ t_pipelineHealthNote }}</div>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:var(--space-4);">
+            <sc-for list="{{ pipelineHealth }}" as="ph" hint-placeholder-count="4">
+              <div style="background:#fff; border:1px solid var(--border); border-top:3px solid {{ ph.color }}; border-radius:var(--radius-md); padding:14px 16px; box-shadow:var(--shadow-sm);">
+                <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+                  <span ref="{{ ph.iconRef }}" style="display:inline-flex; width:13px; height:13px; color:{{ ph.color }}; flex-shrink:0;"></span>
+                  <span style="font-size:11.5px; font-weight:700; color:var(--fg2);">{{ ph.label }}</span>
+                </div>
+                <div style="font-family:var(--font-display); font-weight:800; font-size:24px; color:var(--navy); letter-spacing:var(--tracking-tight);">{{ ph.value }}</div>
+                <div style="font-size:11px; color:var(--fg3); margin-top:4px;">{{ ph.sub }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div>
+          <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:var(--space-3);">
+            <div style="font-size:12px; font-weight:700; letter-spacing:var(--tracking-caption); text-transform:uppercase; color:var(--fg3);">{{ t_panelsTitle }}</div>
+            <div style="font-size:12px; color:var(--fg3);">{{ t_hoverHint }}</div>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(440px, 1fr)); gap:var(--space-5);">
+            <sc-for list="{{ panels }}" as="panel" hint-placeholder-count="4">
+              <div
+                onMouseEnter="{{ panel.onHoverStart }}"
+                onMouseLeave="{{ panel.onHoverEnd }}"
+                onClick="{{ panel.onToggle }}"
+                style="position:relative; overflow:hidden; background:#fff; border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-md); cursor:pointer; min-height:300px; display:flex; flex-direction:column;"
+              >
+                <div style="padding:var(--space-5) var(--space-5) 0; flex:1;">
+                  <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:var(--space-3);">
+                    <div>
+                      <div style="font-family:var(--font-display); font-weight:800; font-size:17px; color:var(--navy);">{{ panel.title }}</div>
+                      <div style="font-size:12.5px; color:var(--fg3); margin-top:3px; max-width:240px;">{{ panel.subLabel }}</div>
+                    </div>
+                    <div style="text-align:right; flex-shrink:0;">
+                      <div style="font-size:10px; color:var(--fg3); font-weight:600; margin-bottom:3px;">{{ t_teamAvg }}</div>
+                      <x-import component-from-global-scope="SpotlerDesignSystem_b204cb.Badge" tone="neutral" outline="{{ true }}" hint-size="70px,22px">{{ panel.teamAvgLabel }}</x-import>
+                    </div>
+                  </div>
+
+                  <div style="display:flex; align-items:baseline; gap:10px; margin-top:16px;">
+                    <span style="font-family:var(--font-display); font-weight:800; font-size:34px; color:var(--navy); letter-spacing:var(--tracking-tight);">{{ panel.countLabel }}</span>
+                    <x-import component-from-global-scope="SpotlerDesignSystem_b204cb.Badge" tone="{{ panel.trendTone }}" hint-size="90px,22px"><span ref="{{ panel.trendIconRef }}" style="display:inline-flex; width:11px; height:11px; flex-shrink:0;"></span>{{ panel.trendLabel }}</x-import>
+                  </div>
+
+                  <div style="margin-top:14px;">
+                    <div style="height:8px; background:var(--grey-100); border-radius:var(--radius-pill); overflow:hidden;">
+                      <div style="height:100%; background:var(--cyan); border-radius:var(--radius-pill); width:{{ panel.progressWidth }}; transition:width var(--dur-slow) var(--ease-out);"></div>
+                    </div>
+                    <div style="font-size:11.5px; color:var(--fg3); margin-top:6px;">{{ panel.targetLabel }}</div>
+                  </div>
+                </div>
+
+                <div style="margin-top:var(--space-4); padding:13px var(--space-5); background:var(--cyan-tint); display:flex; gap:9px; align-items:flex-start;">
+                  <span ref="{{ arrowRightIconRef }}" style="display:inline-flex; width:14px; height:14px; color:var(--cyan-shade); flex-shrink:0; margin-top:2px;"></span>
+                  <span style="font-size:13px; line-height:1.5; color:var(--navy);">{{ panel.nextAction }}</span>
+                </div>
+
+                <sc-if value="{{ panel.showLeaderboard }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute; inset:0; background:#fff; display:flex; flex-direction:column; animation:cx-lb-fade var(--dur) var(--ease-out);">
+                    <div style="padding:14px var(--space-5) 10px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
+                      <div style="font-family:var(--font-display); font-weight:800; font-size:14.5px; color:var(--navy);">{{ t_leaderboardTitle }} {{ panel.title }}</div>
+                      <span ref="{{ trophyIconRef }}" style="display:inline-flex; width:15px; height:15px; color:var(--cyan-shade); flex-shrink:0;"></span>
+                    </div>
+                    <div style="flex:1; overflow-y:auto; padding:6px var(--space-3);">
+                      <sc-for list="{{ panel.leaderboard }}" as="row" hint-placeholder-count="14">
+                        <div style="display:flex; align-items:center; gap:10px; padding:5px 10px; border-radius:var(--radius-sm); background:{{ row.rowBg }};">
+                          <span style="width:16px; font-size:11px; font-weight:700; color:var(--fg3); flex-shrink:0;">{{ row.rank }}</span>
+                          <sc-if value="{{ row.isNamed }}" hint-placeholder-val="{{ true }}">
+                            <span style="flex:1; font-size:13px; font-weight:{{ row.nameWeight }}; color:var(--navy);">{{ row.name }}</span>
+                          </sc-if>
+                          <sc-if value="{{ row.isMasked }}" hint-placeholder-val="{{ false }}">
+                            <span style="flex:1; display:flex;">
+                              <span style="display:inline-block; height:9px; width:{{ row.maskWidth }}; background:var(--grey-200); border-radius:2px;"></span>
+                            </span>
+                          </sc-if>
+                          <sc-if value="{{ row.isViewer }}" hint-placeholder-val="{{ false }}">
+                            <x-import component-from-global-scope="SpotlerDesignSystem_b204cb.Badge" tone="active" hint-size="34px,18px">{{ t_you }}</x-import>
+                          </sc-if>
+                          <span style="font-size:12px; font-weight:700; color:var(--fg2); flex-shrink:0; min-width:68px; text-align:right; white-space:nowrap;">{{ row.countLabel }}</span>
+                        </div>
+                      </sc-for>
+                    </div>
+                    <div style="padding:10px var(--space-4); border-top:1px solid var(--border); background:var(--off-white); flex-shrink:0;">
+                      <span style="font-size:10.5px; color:var(--fg3); line-height:1.4;">{{ t_leaderboardFooter }}</span>
+                    </div>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="margin-top:var(--space-7);">
+          <div style="font-size:12px; font-weight:700; letter-spacing:var(--tracking-caption); text-transform:uppercase; color:var(--fg3); margin-bottom:var(--space-3);">{{ t_rulesTitle }}</div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:var(--space-4);">
+            <sc-for list="{{ businessRules }}" as="rule" hint-placeholder-count="2">
+              <x-import component-from-global-scope="SpotlerDesignSystem_b204cb.Card" elevation="sm" radius="lg" padding="{{ 18 }}" hint-size="100%,120px">
+                <x-import component-from-global-scope="SpotlerDesignSystem_b204cb.Badge" tone="warning" hint-size="70px,20px">{{ rule.badgeLabel }}</x-import>
+                <div style="font-family:var(--font-display); font-weight:800; font-size:14.5px; color:var(--navy); margin-top:9px; margin-bottom:5px;">{{ rule.title }}</div>
+                <div style="font-size:12.5px; color:var(--fg2); line-height:1.55;">{{ rule.desc }}</div>
+              </x-import>
+            </sc-for>
+          </div>
+        </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isToolkitView }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:var(--space-6) 0 0;">
+          <div style="font-family:var(--font-display); font-weight:800; font-size:var(--fs-h2); color:var(--navy); margin-bottom:6px;">{{ t_toolkitTitle }}</div>
+          <div style="font-size:14px; color:var(--fg3); margin-bottom:var(--space-6); max-width:640px;">{{ t_toolkitSub }}</div>
+          <div style="display:flex; gap:10px; margin-bottom:var(--space-6); flex-wrap:wrap; align-items:center;">
+            <input placeholder="{{ t_searchPlaceholder }}" style="flex:1; min-width:200px; max-width:300px; padding:10px 16px; border:1.5px solid var(--border-strong); border-radius:var(--radius-pill); font-family:var(--font-body); font-size:13px; outline:none; color:var(--fg1);" />
+            <sc-for list="{{ toolkitTags }}" as="tag" hint-placeholder-count="5">
+              <x-import component-from-global-scope="SpotlerDesignSystem_b204cb.Badge" tone="neutral" outline="{{ true }}" hint-size="90px,26px">{{ tag }}</x-import>
+            </sc-for>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:var(--space-4);">
+            <sc-for list="{{ stageCards }}" as="stage" hint-placeholder-count="5">
+              <div onClick="{{ stage.onClick }}" style-hover="box-shadow:var(--shadow-lg);" style="background:#fff; border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); padding:var(--space-5); cursor:pointer; transition:box-shadow var(--dur) var(--ease-out);">
+                <div style="width:40px; height:40px; border-radius:var(--radius-md); background:var(--cyan-tint); display:flex; align-items:center; justify-content:center; margin-bottom:14px;">
+                  <span ref="{{ stage.iconRef }}" style="display:inline-flex; width:19px; height:19px; color:var(--cyan-shade); flex-shrink:0;"></span>
+                </div>
+                <div style="font-family:var(--font-display); font-weight:800; font-size:16px; color:var(--navy); margin-bottom:5px;">{{ stage.title }}</div>
+                <div style="font-size:13px; color:var(--fg3); line-height:1.5;">{{ stage.blurb }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isStageView }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:var(--space-6) 0 0;">
+          <button onClick="{{ onBackToToolkit }}" style-hover="color:var(--navy);" style="display:flex; align-items:center; gap:6px; background:none; border:none; padding:0; margin-bottom:var(--space-4); color:var(--fg3); font-size:13px; font-weight:600; cursor:pointer; font-family:var(--font-body);">
+            <span ref="{{ arrowLeftIconRef }}" style="display:inline-flex; width:14px; height:14px; flex-shrink:0;"></span>{{ t_backToToolkit }}
+          </button>
+          <div style="font-family:var(--font-display); font-weight:800; font-size:var(--fs-h2); color:var(--navy); margin-bottom:6px;">{{ activeStageData.title }}</div>
+          <div style="font-size:14px; color:var(--fg3); margin-bottom:var(--space-6); max-width:640px;">{{ activeStageData.blurb }}</div>
+
+          <sc-for list="{{ activeStageData.richItems }}" as="rich" hint-placeholder-count="0">
+            <sc-if value="{{ rich.isTable }}" hint-placeholder-val="{{ false }}">
+              <div style="background:#fff; border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); padding:var(--space-5); margin-bottom:var(--space-5);">
+                <div style="font-family:var(--font-display); font-weight:800; font-size:16px; color:var(--navy); margin-bottom:8px;">{{ rich.title }}</div>
+                <div style="font-size:12.5px; color:var(--fg3); line-height:1.6; margin-bottom:14px;">{{ rich.caption }}</div>
+                <div style="overflow-x:auto;">
+                  <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                    <thead>
+                      <tr>
+                        <th style="text-align:left; font-size:11px; font-weight:700; color:var(--fg3); text-transform:uppercase; letter-spacing:0.04em; padding:7px 10px; border-bottom:1px solid var(--border);">{{ t_tableProduct }}</th>
+                        <th style="text-align:left; font-size:11px; font-weight:700; color:var(--fg3); text-transform:uppercase; letter-spacing:0.04em; padding:7px 10px; border-bottom:1px solid var(--border);">{{ t_tableDesc }}</th>
+                        <th style="text-align:right; font-size:11px; font-weight:700; color:var(--fg3); text-transform:uppercase; letter-spacing:0.04em; padding:7px 10px; border-bottom:1px solid var(--border);">{{ t_tableNb }}</th>
+                        <th style="text-align:right; font-size:11px; font-weight:700; color:var(--fg3); text-transform:uppercase; letter-spacing:0.04em; padding:7px 10px; border-bottom:1px solid var(--border);">{{ t_tableEb }}</th>
+                        <th style="text-align:left; font-size:11px; font-weight:700; color:var(--fg3); text-transform:uppercase; letter-spacing:0.04em; padding:7px 10px; border-bottom:1px solid var(--border);">{{ t_tableType }}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <sc-for list="{{ rich.rows }}" as="row" hint-placeholder-count="13">
+                        <tr style="background:{{ row.rowBg }};">
+                          <td style="padding:8px 10px; border-bottom:1px solid var(--border); font-weight:700; color:var(--navy); white-space:nowrap;">{{ row.product }}</td>
+                          <td style="padding:8px 10px; border-bottom:1px solid var(--border); font-size:12px; color:var(--fg3);">{{ row.desc }}</td>
+                          <td style="padding:8px 10px; border-bottom:1px solid var(--border); text-align:right; font-weight:700; color:var(--navy); white-space:nowrap;">{{ row.nb }}</td>
+                          <td style="padding:8px 10px; border-bottom:1px solid var(--border); text-align:right; color:var(--fg3); white-space:nowrap;">{{ row.eb }}</td>
+                          <td style="padding:8px 10px; border-bottom:1px solid var(--border); white-space:nowrap;">
+                            <x-import component-from-global-scope="SpotlerDesignSystem_b204cb.Badge" tone="{{ row.typeTone }}" outline="{{ true }}" hint-size="80px,20px">{{ row.typeLabel }}</x-import>
+                          </td>
+                        </tr>
+                      </sc-for>
+                    </tbody>
+                  </table>
+                </div>
+                <div style="margin-top:12px; padding:10px 13px; background:var(--cyan-tint); border-radius:var(--radius-md); font-size:12px; color:var(--navy); line-height:1.5;">{{ rich.warningText }}</div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ rich.isScript }}" hint-placeholder-val="{{ false }}">
+              <div style="background:#fff; border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); padding:var(--space-5); margin-bottom:var(--space-5);">
+                <div style="font-family:var(--font-display); font-weight:800; font-size:16px; color:var(--navy); margin-bottom:12px;">{{ rich.title }}</div>
+                <div style="padding:12px 15px; background:var(--cyan-tint); border-radius:var(--radius-md); font-size:13px; color:var(--navy); line-height:1.6; margin-bottom:16px;">{{ rich.ruleText }}</div>
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:var(--space-4);">
+                  <div>
+                    <div style="font-size:12px; font-weight:700; color:var(--fg2); margin-bottom:7px;">{{ rich.callLabel }}</div>
+                    <div style="background:var(--off-white); border:1px solid var(--border); border-radius:var(--radius-md); padding:14px; font-size:13px; color:var(--fg1); line-height:1.6; white-space:pre-line;">{{ rich.callScript }}</div>
+                  </div>
+                  <div>
+                    <div style="font-size:12px; font-weight:700; color:var(--fg2); margin-bottom:7px;">{{ rich.emailLabel }}</div>
+                    <div style="background:var(--off-white); border:1px solid var(--border); border-radius:var(--radius-md); padding:14px;">
+                      <div style="font-size:12px; font-weight:700; color:var(--navy); margin-bottom:8px; padding-bottom:8px; border-bottom:1px solid var(--border);">{{ rich.emailSubject }}</div>
+                      <div style="font-size:13px; color:var(--fg1); line-height:1.6; white-space:pre-line;">{{ rich.emailBody }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ rich.isProtocols }}" hint-placeholder-val="{{ false }}">
+              <div style="background:#fff; border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); padding:var(--space-5); margin-bottom:var(--space-5);">
+                <div style="font-family:var(--font-display); font-weight:800; font-size:16px; color:var(--navy); margin-bottom:6px;">{{ rich.title }}</div>
+                <div style="font-size:12.5px; color:var(--fg3); line-height:1.6; margin-bottom:16px;">{{ rich.caption }}</div>
+                <sc-for list="{{ rich.sources }}" as="src" hint-placeholder-count="6">
+                  <div style="border:1.5px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; margin-bottom:10px;">
+                    <div onClick="{{ src.onToggle }}" style-hover="background:var(--off-white);" style="padding:12px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; background:#fff;">
+                      <div style="display:flex; align-items:center; gap:11px; min-width:0;">
+                        <div style="width:32px; height:32px; border-radius:8px; background:var(--cyan-tint); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                          <span ref="{{ src.iconRef }}" style="display:inline-flex; width:16px; height:16px; color:var(--cyan-shade); flex-shrink:0;"></span>
+                        </div>
+                        <div style="min-width:0;">
+                          <div style="font-size:13.5px; font-weight:800; color:var(--navy);">{{ src.name }}</div>
+                          <div style="font-size:11.5px; color:var(--fg3); margin-top:1px;">{{ src.sub }}</div>
+                        </div>
+                      </div>
+                      <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+                        <sc-for list="{{ src.badges }}" as="b" hint-placeholder-count="2">
+                          <span style="font-size:10.5px; font-weight:700; color:var(--navy); background:var(--off-white); padding:4px 9px; border-radius:var(--radius-pill); white-space:nowrap;">{{ b }}</span>
+                        </sc-for>
+                        <span ref="{{ src.chevronRef }}" style="display:inline-flex; width:13px; height:13px; color:var(--fg3); flex-shrink:0;"></span>
+                      </div>
+                    </div>
+                    <sc-if value="{{ src.isOpen }}" hint-placeholder-val="{{ false }}">
+                      <div style="padding:16px; display:flex; flex-direction:column; gap:14px; border-top:1px solid var(--border);">
+                        <div style="display:flex; flex-direction:column; gap:8px;">
+                          <sc-for list="{{ src.steps }}" as="st" hint-placeholder-count="5">
+                            <div style="display:flex; gap:11px; align-items:flex-start;">
+                              <div style="width:20px; height:20px; border-radius:50%; background:var(--cyan-tint); color:var(--cyan-shade); font-size:10.5px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;">{{ st.n }}</div>
+                              <div style="flex:1;">
+                                <div style="font-size:12.5px; font-weight:700; color:var(--navy);">{{ st.action }}</div>
+                                <div style="font-size:12px; color:var(--fg2); line-height:1.5; margin-top:2px;">{{ st.detail }}</div>
+                              </div>
+                              <div style="font-size:10.5px; font-weight:700; color:var(--fg3); white-space:nowrap; flex-shrink:0; margin-top:2px;">{{ st.timing }}</div>
+                            </div>
+                          </sc-for>
+                        </div>
+                        <sc-if value="{{ src.warn }}" hint-placeholder-val="{{ false }}">
+                          <div style="background:var(--orange-tint); border:1px solid var(--warning); border-radius:var(--radius-md); padding:10px 13px; font-size:12px; color:var(--warning); line-height:1.5;">{{ src.warn }}</div>
+                        </sc-if>
+                        <div style="background:var(--off-white); border-radius:var(--radius-md); padding:11px 14px;">
+                          <div style="font-size:11px; font-weight:700; color:var(--fg2); margin-bottom:6px;">{{ src.tipsLabel }}</div>
+                          <sc-for list="{{ src.tips }}" as="tip" hint-placeholder-count="2">
+                            <div style="display:flex; gap:7px; font-size:12px; color:var(--fg2); line-height:1.5; margin-bottom:4px;"><span style="color:var(--cyan-shade); flex-shrink:0;">→</span><span>{{ tip }}</span></div>
+                          </sc-for>
+                        </div>
+                        <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                          <sc-for list="{{ src.hsFields }}" as="f" hint-placeholder-count="4">
+                            <span style="font-size:10.5px; font-weight:600; color:var(--fg2); background:var(--grey-50); border:1px solid var(--border); padding:3px 9px; border-radius:var(--radius-pill);">{{ f }}</span>
+                          </sc-for>
+                        </div>
+                        <div style="font-size:11.5px; color:var(--cyan-shade); line-height:1.55; background:var(--cyan-tint); border-radius:var(--radius-md); padding:10px 13px;">{{ src.autoAssign }}</div>
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ rich.isLinks }}" hint-placeholder-val="{{ false }}">
+              <div style="background:#fff; border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); padding:var(--space-5); margin-bottom:var(--space-5);">
+                <div style="font-family:var(--font-display); font-weight:800; font-size:16px; color:var(--navy); margin-bottom:6px;">{{ rich.title }}</div>
+                <div style="font-size:12.5px; color:var(--fg3); line-height:1.6; margin-bottom:16px;">{{ rich.caption }}</div>
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:var(--space-4);">
+                  <sc-for list="{{ rich.links }}" as="lk" hint-placeholder-count="2">
+                    <div onClick="{{ lk.onClick }}" style-hover="border-color:var(--cyan); box-shadow:var(--shadow-md);" style="border:1.5px solid var(--border); border-radius:var(--radius-lg); padding:var(--space-4); cursor:pointer; display:flex; flex-direction:column; gap:10px; transition:box-shadow var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out);">
+                      <div style="width:36px; height:36px; border-radius:var(--radius-md); background:var(--cyan-tint); display:flex; align-items:center; justify-content:center;">
+                        <span ref="{{ lk.iconRef }}" style="display:inline-flex; width:17px; height:17px; color:var(--cyan-shade); flex-shrink:0;"></span>
+                      </div>
+                      <div>
+                        <div style="font-size:14px; font-weight:800; color:var(--navy); display:flex; align-items:center; gap:6px;">{{ lk.label }}<span ref="{{ lk.arrowRef }}" style="display:inline-flex; width:12px; height:12px; color:var(--cyan-shade); flex-shrink:0;"></span></div>
+                        <div style="font-size:12px; color:var(--fg3); line-height:1.5; margin-top:3px;">{{ lk.desc }}</div>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ rich.isSingleScript }}" hint-placeholder-val="{{ false }}">
+              <div style="background:#fff; border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); padding:var(--space-5); margin-bottom:var(--space-5);">
+                <div style="font-family:var(--font-display); font-weight:800; font-size:16px; color:var(--navy); margin-bottom:12px;">{{ rich.title }}</div>
+                <div style="padding:12px 15px; background:var(--cyan-tint); border-radius:var(--radius-md); font-size:13px; color:var(--navy); line-height:1.6; margin-bottom:16px;">{{ rich.ruleText }}</div>
+                <div style="font-size:12px; font-weight:700; color:var(--fg2); margin-bottom:7px;">{{ rich.scriptLabel }}</div>
+                <div style="background:var(--off-white); border:1px solid var(--border); border-radius:var(--radius-md); padding:14px; font-size:13px; color:var(--fg1); line-height:1.6; white-space:pre-line; max-width:640px;">{{ rich.scriptBody }}</div>
+              </div>
+            </sc-if>
+          </sc-for>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:var(--space-4);">
+            <sc-for list="{{ activeStageData.items }}" as="it" hint-placeholder-count="4">
+              <div style="background:#fff; border:1px dashed var(--border-strong); border-radius:var(--radius-lg); padding:var(--space-4); display:flex; flex-direction:column; gap:12px;">
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                  <span ref="{{ fileTextIconRef }}" style="display:inline-flex; width:16px; height:16px; color:var(--fg3); flex-shrink:0;"></span>
+                  <x-import component-from-global-scope="SpotlerDesignSystem_b204cb.Badge" tone="neutral" hint-size="80px,20px">{{ t_comingSoon }}</x-import>
+                </div>
+                <div style="font-size:13.5px; font-weight:700; color:var(--navy);">{{ it }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isUsecasesView }}" hint-placeholder-val="{{ false }}">
+        <div style="margin:0 calc(-1 * var(--space-7)); background:#eef2f6;">
+          <div ref="{{ useCaseMountRef }}"></div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isPlaceholderView }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:var(--space-8) 0; display:flex; flex-direction:column; align-items:flex-start; gap:8px;">
+          <div style="font-family:var(--font-display); font-weight:800; font-size:var(--fs-h2); color:var(--navy);">{{ placeholderTitle }}</div>
+          <div style="font-size:14px; color:var(--fg3);">{{ t_notBuiltYet }}</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isHelpView }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:var(--space-6) 0 0; display:flex; flex-direction:column; gap:var(--space-6);">
+          <div style="font-family:var(--font-display); font-weight:800; font-size:var(--fs-h2); color:var(--navy);">{{ t_help }}</div>
+
+          <div style="background:#fff; border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); padding:var(--space-5);">
+            <div style="font-family:var(--font-display); font-weight:800; font-size:16px; color:var(--navy); margin-bottom:12px;">{{ t_closedLostTitle }}</div>
+            <div style="display:flex; gap:7px; flex-wrap:wrap; margin-bottom:14px;">
+              <sc-for list="{{ closedLostReasons }}" as="reason" hint-placeholder-count="7">
+                <x-import component-from-global-scope="SpotlerDesignSystem_b204cb.Badge" tone="neutral" outline="{{ true }}" hint-size="70px,22px">{{ reason }}</x-import>
+              </sc-for>
+            </div>
+            <div style="font-size:13px; color:var(--fg2); line-height:1.6;">{{ t_closedLostNote }}</div>
+          </div>
+
+          <div>
+            <div style="font-family:var(--font-display); font-weight:800; font-size:16px; color:var(--navy); margin-bottom:12px;">{{ t_contactsTitle }}</div>
+            <div style="background:var(--cyan-tint); border-radius:var(--radius-lg); padding:var(--space-4); display:flex; align-items:center; gap:14px; margin-bottom:14px;">
+              <div style="width:44px; height:44px; border-radius:50%; background:var(--navy); color:#fff; display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:800; font-family:var(--font-display); flex-shrink:0;">{{ owner.initials }}</div>
+              <div>
+                <div style="font-size:14.5px; font-weight:800; color:var(--navy);">{{ owner.name }}</div>
+                <div style="font-size:12px; color:var(--navy); opacity:0.75;">{{ owner.role }}</div>
+              </div>
+            </div>
+            <div style="font-size:12.5px; color:var(--fg2); line-height:1.6; margin-bottom:16px; max-width:640px;">{{ owner.desc }}</div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:var(--space-4); margin-bottom:14px;">
+              <sc-for list="{{ contacts }}" as="c" hint-placeholder-count="3">
+                <div style="background:#fff; border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); padding:var(--space-4);">
+                  <div style="width:38px; height:38px; border-radius:50%; background:var(--cyan-tint); color:var(--cyan-shade); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; font-family:var(--font-display); margin-bottom:10px;">{{ c.initials }}</div>
+                  <div style="font-size:13.5px; font-weight:700; color:var(--navy); margin-bottom:3px;">{{ c.name }}</div>
+                  <div style="font-size:12px; color:var(--fg3); line-height:1.5;">{{ c.desc }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="background:var(--off-white); border:1px solid var(--border); border-radius:var(--radius-md); padding:12px 15px; font-size:12px; color:var(--fg3); line-height:1.5;">{{ t_contactsFooter }}</div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isAdminView }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:var(--space-6) 0 0;">
+          <div style="font-family:var(--font-display); font-weight:800; font-size:var(--fs-h2); color:var(--navy); margin-bottom:6px;">{{ t_adminTitle }}</div>
+          <div style="font-size:14px; color:var(--fg3); margin-bottom:var(--space-6); max-width:640px;">{{ t_adminSub }}</div>
+
+          <div style="background:#fff; border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); padding:var(--space-5); margin-bottom:var(--space-5);">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:var(--space-3); margin-bottom:8px; flex-wrap:wrap;">
+              <div style="font-family:var(--font-display); font-weight:800; font-size:16px; color:var(--navy);">{{ t_routingTitle }}</div>
+              <x-import component-from-global-scope="SpotlerDesignSystem_b204cb.Badge" tone="active" outline="{{ true }}" hint-size="150px,22px">{{ t_routingBadge }}</x-import>
+            </div>
+            <div style="font-size:12.5px; color:var(--fg3); line-height:1.6; margin-bottom:16px;">{{ t_routingCaption }}</div>
+
+            <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px;">
+              <sc-for list="{{ routingSteps }}" as="rs" hint-placeholder-count="3">
+                <div style="display:flex; gap:13px; align-items:flex-start; padding:12px 14px; border-radius:var(--radius-md); background:{{ rs.bg }}; opacity:{{ rs.opacity }};">
+                  <div style="width:24px; height:24px; border-radius:50%; background:#fff; color:var(--cyan-shade); font-size:11.5px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0;">{{ rs.n }}</div>
+                  <div style="flex:1;">
+                    <div style="font-size:13px; font-weight:700; color:var(--navy);">{{ rs.action }}</div>
+                    <div style="font-size:12px; color:var(--fg2); line-height:1.55; margin-top:3px;">{{ rs.detail }}</div>
+                  </div>
+                  <div style="font-size:10.5px; font-weight:700; color:var(--fg3); white-space:nowrap; flex-shrink:0; margin-top:2px;">{{ rs.tag }}</div>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:var(--space-4);">
+              <div style="border:1px solid var(--border); border-radius:var(--radius-md); padding:13px 15px;">
+                <div style="font-size:12px; font-weight:700; color:var(--navy); margin-bottom:6px;">{{ t_fallbackTitle }}</div>
+                <div style="font-size:12px; color:var(--fg2); line-height:1.6;">{{ t_fallbackText }}</div>
+              </div>
+              <div style="border:1px solid var(--warning); background:var(--orange-tint); border-radius:var(--radius-md); padding:13px 15px;">
+                <div style="font-size:12px; font-weight:700; color:var(--warning); margin-bottom:6px;">{{ t_priorityTitle }}</div>
+                <div style="font-size:12px; color:var(--warning); line-height:1.6;">{{ t_priorityText }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:#fff; border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); padding:var(--space-5); margin-bottom:var(--space-5);">
+            <div style="font-family:var(--font-display); font-weight:800; font-size:16px; color:var(--navy); margin-bottom:8px;">{{ t_ownerTableTitle }}</div>
+            <div style="overflow-x:auto;">
+              <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                <thead>
+                  <tr>
+                    <th style="text-align:left; font-size:11px; font-weight:700; color:var(--fg3); text-transform:uppercase; letter-spacing:0.04em; padding:7px 10px; border-bottom:1px solid var(--border);">{{ t_ownerColProduct }}</th>
+                    <th style="text-align:left; font-size:11px; font-weight:700; color:var(--fg3); text-transform:uppercase; letter-spacing:0.04em; padding:7px 10px; border-bottom:1px solid var(--border);">{{ t_ownerColOwner }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <sc-for list="{{ ownerRows }}" as="row" hint-placeholder-count="12">
+                    <tr style="background:{{ row.rowBg }};">
+                      <td style="padding:8px 10px; border-bottom:1px solid var(--border); font-weight:700; color:var(--navy); white-space:nowrap;">{{ row.product }}</td>
+                      <td style="padding:8px 10px; border-bottom:1px solid var(--border); color:var(--fg2);">
+                        <sc-if value="{{ row.hasOwner }}" hint-placeholder-val="{{ true }}">{{ row.owner }}</sc-if>
+                        <sc-if value="{{ row.noOwner }}" hint-placeholder-val="{{ false }}">
+                          <x-import component-from-global-scope="SpotlerDesignSystem_b204cb.Badge" tone="warning" hint-size="150px,20px">{{ t_noOwnerBadge }}</x-import>
+                        </sc-if>
+                      </td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </div>
+            <div style="margin-top:12px; padding:10px 13px; background:var(--orange-tint); border-radius:var(--radius-md); font-size:12px; color:var(--warning); line-height:1.5;">{{ t_ownerComboNote }}</div>
+          </div>
+        </div>
+      </sc-if>
+
+      <div style="padding:var(--space-6) 0 0; display:flex; justify-content:flex-end;">
+        <span onClick="{{ onOpenHelp }}" style-hover="text-decoration:underline; color:var(--navy);" style="font-size:12px; color:var(--fg3); font-weight:600; cursor:pointer;">{{ t_help }}</span>
+      </div>
+
+    </div>
+  </div>
+
+  <sc-if value="{{ isDemoStudioView }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; top:0; right:0; bottom:0; left:{{ demoStudioLeftInset }}; z-index:500; background:#fff; transition: left 0.22s var(--ease-out, ease);">
+      <iframe key="{{ demoStudioKey }}" src="demo-studio/index.html?fresh=1" title="Demo Studio" style="width:100%; height:100%; border:none; display:block;"></iframe>
+      <sc-if value="{{ demoStudioFullscreen }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ onExitDemoStudio }}" style-hover="background:rgba(0,42,77,0.85);" style="position:absolute; top:16px; right:16px; z-index:501; display:flex; align-items:center; gap:6px; padding:8px 14px; border:none; border-radius:var(--radius-pill); background:rgba(0,42,77,0.55); backdrop-filter:blur(8px); color:#fff; font-family:var(--font-body); font-size:12.5px; font-weight:700; cursor:pointer;">
+          <span ref="{{ exitIconRef }}" style="display:inline-flex; width:13px; height:13px; flex-shrink:0;"></span>
+          {{ t_exitDemoStudio }}
+        </button>
+      </sc-if>
+    </div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const I18N = {
+  nl: {
+    viewingAs: 'Bekijken als',
+    hi: 'Hoi',
+    points: 'coachingpunten',
+    funnelTitle: 'Funnel: jij versus team',
+    you: 'jij',
+    team: 'Team',
+    panelsTitle: 'Coachingpanelen',
+    hoverHint: 'Beweeg over een panel voor de ranglijst',
+    teamAvg: 'Teamgemiddelde',
+    leaderboardTitle: 'Ranglijst:',
+    leaderboardFooter: 'Namen in de onderste helft blijven verborgen totdat je stijgt op de ranglijst.',
+    dataAsOf: 'Gegevens van',
+    period_week: 'Vorige week',
+    period_month: 'Vorige maand',
+    period_quarter: 'Vorig kwartaal',
+    vsLastWeek: 't.o.v. vorige week',
+    vsPrevPeriod: 't.o.v. vorige periode',
+    periodWordWeek: 'deze week',
+    periodWordMonth: 'deze maand',
+    periodWordQuarter: 'dit kwartaal',
+    navHome: 'Home',
+    navTeam: 'Team',
+    navToolkit: 'Toolkit',
+    navUseCases: 'Use cases',
+    navDemoStudio: 'Demo Studio',
+    navHelp: 'Help',
+    repRole: 'Rep',
+    toolkitTitle: 'Toolkit',
+    toolkitSub: 'Alles wat je nodig hebt, geordend per funnelfase.',
+    searchPlaceholder: 'Zoeken...',
+    backToToolkit: 'Terug naar Toolkit',
+    comingSoon: 'Binnenkort',
+    notBuiltYet: 'Dit onderdeel is deze sessie nog niet gebouwd.',
+    exitDemoStudio: 'Terug naar Playbook',
+    rulesTitle: 'Belangrijke regels',
+    rules: [
+      { badgeLabel: 'Verplicht', title: 'Cross-sell leadverdeling', desc: 'Bij een cross-sell lead die wordt overgedragen en wint, gaat 25% van de deal naar de collega die de lead heeft aangedragen. De sales die de lead oppakt en sluit, ontvangt de resterende 75%.' },
+      { badgeLabel: 'Verplicht', title: 'Maximale korting op eigen initiatief', desc: 'Op eigen initiatief mag je maximaal 15% korting geven. Voor hogere kortingen is akkoord van je manager vereist.' },
+    ],
+    closedLostTitle: 'Closed-Lost redenen',
+    closedLostReasons: ['Competition', 'Price', 'No fit', 'Features', 'On Hold', 'Unreachable', 'Unknown'],
+    closedLostNote: "De reden is verplicht bij het sluiten als Closed Lost. Bij Competition geef je aan welke concurrent het is. 25% van verlies staat op 'On Hold' — overweeg een herijkingscadans van 90 tot 180 dagen.",
+    contactsTitle: 'Wie kun je bereiken',
+    owner: { name: 'Glenn', role: 'Eigenaar van het playbook · Chief Revenue Officer', desc: 'Glenn is eindverantwoordelijk voor de inhoud, structuur en strategische keuzes in dit playbook, inclusief de toewijzingslogica, producteigenaarschap en prioritering van actiepunten.' },
+    contacts: [
+      { name: 'Manuela Crielaard', desc: 'Aanspreekpunt voor vragen, opmerkingen of aanpassingen op het playbook.' },
+      { name: 'Sjoerd de Jong', desc: 'Aanspreekpunt voor vragen, opmerkingen of aanpassingen op het playbook.' },
+      { name: 'Robbert Brouwer', desc: 'Aanspreekpunt voor vragen, opmerkingen of aanpassingen op het playbook.' },
+    ],
+    contactsFooter: 'Heb je een correctie, aanvulling of zie je iets dat niet meer klopt? Neem contact op met Manuela, Sjoerd of Robbert. Zij verzamelen feedback en stemmen wijzigingen af met Glenn.',
+    tableProduct: 'Product', tableDesc: 'Beschrijving', tableNb: 'NB mediaan MRR', tableEb: 'EB mediaan MRR-change', tableType: 'Type',
+    stageQualified: 'Gekwalificeerd',
+    stageDemo: 'Demo',
+    stageProposal: 'Voorstel',
+    stageClosedWon: 'Gewonnen',
+    panelDiscoveryTitle: 'Ontdekking & kwalificatie',
+    panelDiscoverySub: 'Kwalificeer hun echte pijnpunt in het eerste gesprek',
+    panelDiscoveryAction: 'Als ze een pijnpunt noemen, vraag twee keer wat het ze dagelijks kost, voordat je verder gaat naar het product.',
+    panelUsecaseTitle: 'Use case scherpstellen',
+    panelUsecaseSub: 'Open elke demo met een afgesproken use case',
+    panelUsecaseAction: 'Laat het prospect de exacte use case bevestigen voordat je de demo boekt. Kunnen ze die niet benoemen, dan is de demo nog niet klaar om te boeken.',
+    panelMultiTitle: 'Multithreading',
+    panelMultiSub: 'Betrek een tweede stakeholder voor de demo',
+    panelMultiAction: 'Vraag wie er nog meer met dit pijnpunt te maken heeft en regel de introductie voor de demo. Deals met een contact vallen het snelst stil.',
+    panelNextstepTitle: 'Vervolgstap discipline',
+    panelNextstepSub: 'Sluit elk gesprek af met een vervolgstap met datum',
+    panelNextstepAction: 'Noem de vervolgstap hardop voordat je ophangt en laat de datum bevestigen. Een vaag "ik hou contact" is waarom deals stil vallen.',
+    programDay: (w, d, len) => `week ${w}, dag ${d} van ${len}`,
+    streakLabel: (n) => `${n}-${n === 1 ? 'week' : 'weken'} streak`,
+    navProducts: 'Producten',
+    quickActions: [
+      { icon: 'search', title: 'Nieuwe lead binnen?', sub: 'Bekijk het opvolgprotocol per bron', stageId: 'prospecting' },
+      { icon: 'filter', title: 'Klaar om te kwalificeren?', sub: 'Open de discovery- en pijnscripts', stageId: 'qualifying' },
+      { icon: 'presentation', title: 'Demo inplannen?', sub: 'Pak het kwalificatiescript en de demo-links', stageId: 'demoing' },
+      { icon: 'file-check', title: 'Deal aan het sluiten?', sub: 'Open de prijsgids en closing scripts', stageId: 'proposing' },
+    ],
+    pipelineHealthTitle: 'Pipeline-gezondheid — team', pipelineHealthNote: 'Vaste analyse, Commercial Team NL · niet gekoppeld aan de periodekeuze hierboven.',
+    pipelineHealth: [
+      { icon: 'trending-up', label: 'Win rate Partner', value: '88%', sub: 'Hoogste ROI — gem. €8.978/deal', tone: 'success' },
+      { icon: 'trending-down', label: 'Win rate Marketing', value: '15%', sub: 'Snelle opvolging is cruciaal', tone: 'warning' },
+      { icon: 'alert-triangle', label: 'Stuck deals >60d', value: '84', sub: "€1,03M vervuilde forecast", tone: 'danger' },
+      { icon: 'euro', label: 'MRR ontbreekt', value: '45%', sub: 'Deals zonder productline item', tone: 'info' },
+    ],
+    admin: {
+      title: 'Admin', sub: 'Lead-routing, producteigenaarschap en toewijzingslogica — referentie voor beheerders.',
+      routingTitle: 'Automatische leadtoewijzing — volledig schema', routingBadge: 'Stap 0 + 2 + fallback + priority = NL',
+      routingCaption: 'De volledige HubSpot-toewijzingsflow zoals technisch gebouwd. Stap 1 (regiopoort) staat er voor de volledigheid bij, maar is geen NL-proces — niet-Nederlandstalige leads gaan naar de regionale teams. Het NL-team werkt met stap 0, stap 2, de fallback en de priority-laag.',
+      routingSteps: [
+        { n: '0', action: 'Account-based check — "Heeft de company al een owner?"', detail: 'Ja, sales-owner → lead gaat automatisch naar die owner (einde van de flow). Nee, of CS-owner → door naar stap 1. Let op: een CS-owner wordt hier overruled — spreek met je team af of CS geïnformeerd blijft.', tag: 'NL-relevant', bg: 'var(--cyan-tint)', opacity: '1' },
+        { n: '1', action: 'Regiopoort — "Taal + regio bepalen" (geen NL-proces)', detail: 'Niet-NL leads worden weggerouteerd: Spaans/Frans → Nicolas · Duits → Peter Proft · Nordics → Per Kittel · Oost-Europa + Italië → Alen Corkovic · UK/Ierland → Engels team · Overig → AI bepaalt. NL-leads gaan door naar stap 2.', tag: 'Andere regio', bg: 'var(--off-white)', opacity: '0.7' },
+        { n: '2', action: 'Producttoewijzing (NL) — round-robin per gevraagd product', detail: 'Zie de producteigenaren-tabel hieronder. Geen match of leeg → fallback round-robin over het hele NB-team (exclusief Harry).', tag: 'NL-relevant', bg: 'var(--cyan-tint)', opacity: '1' },
+      ],
+      fallbackTitle: 'Fallback round-robin', fallbackText: 'Bij geen productmatch of een leeg productveld: de lead gaat round-robin over het hele NB-team, exclusief Harry.',
+      priorityTitle: 'Prioriteitslaag — High Intent', priorityText: 'Een Partner-lead krijgt het label High Intent en overrult de normale productowner-toewijzing. Dit staat los van de win rate-prioritering (Partner = 88%) — het is een aparte routing-regel.',
+      ownerTableTitle: 'Producteigenaren NL — round-robin toewijzing', ownerColProduct: 'Product', ownerColOwner: 'Eigenaar(en)', noOwnerBadge: 'Geen eigenaar — fallback',
+      ownerComboNote: 'Combinatie van producten: nog niet vastgelegd hoe een lead met meerdere productinteresses wordt toegewezen. Tot die regel er is: handmatige check door de teamlead bij multi-product leads.',
+    },
+    stages: [
+      { id: 'prospecting', icon: 'search', title: 'Prospecting', blurb: 'Vind en routeer de juiste leads voor het eerste gesprek.', items: ['Eerste-contact scripts', 'Tijdlijn'], richItems: [
+        { isProtocols: true, title: 'Leadbron-protocollen', caption: 'Klik op een bron voor de stappen, tips en HubSpot-velden.',
+          sources: [
+            { id: 'marketing', icon: 'megaphone', name: 'Inbound / Marketing', sub: 'Websiteformulier, SEO, campagne', badges: ['Geen deal vóór interesse', 'Bellen binnen 1 uur'],
+              steps: [
+                { n: 1, action: 'Check het formulier en de context', detail: 'Bekijk welk formulier is ingevuld. Zoek het bedrijf op in HubSpot en LinkedIn. Noteer één relevante haak.', timing: 'Direct' },
+                { n: 2, action: 'Stuur een gepersonaliseerde e-mail', detail: 'Benoem het formuliertype, stuur je contactgegevens mee en bied twee tijdsloten aan.', timing: 'T+0' },
+                { n: 3, action: 'Bel de lead', detail: 'Opener: noem je naam, Spotler en het ingevulde formulier. Stel open vragen. Doel: kwalificeer en plan een afspraak.', timing: 'T+1 uur' },
+                { n: 4, action: 'Tweede belpoging + voicemail', detail: 'Probeer een ander tijdstip. Voicemail: kort en persoonlijk, verwijs naar je mail.', timing: 'T+24 uur' },
+                { n: 5, action: 'Derde belpoging', detail: 'Laatste poging. Interesse bevestigd → deal aanmaken op Opportunity. Vul altijd het product in — zonder product geen dealwaarde. Geen reactie → stap 6.', timing: 'T+48 uur' },
+                { n: 6, action: 'Auto-herinnering #2 → Closed Lost', detail: 'Na T+72 uur zonder reactie: Closed Lost — Unreachable. Log alle pogingen in HubSpot.', timing: 'T+72 uur' },
+              ],
+              tipsLabel: 'Tips', tips: ['Noem het specifieke formulier dat de lead invulde — dat schept direct herkenning.', 'Maak geen deal aan vóór bevestigde interesse — dit vervuilt de pipeline.', 'Prijsaanvragen zijn verder in de buyer journey — prioriteer boven contactformulieren.'],
+              hsFields: ['Deal Origin: Marketing', 'Lead status: New → Attempting', 'Formuliertype', 'Kwalificatienotities', 'Next step + datum'],
+              autoAssign: 'Stap 0 (account-based) checkt eerst op een bestaande owner. Geen match → stap 2: round-robin op basis van het gevraagde product. Het product wordt automatisch als productline item toegevoegd bij het aanmaken van de deal.' },
+            { id: 'partner', icon: 'handshake', name: 'Partner / Reseller', sub: 'Aangedragen via het partnerkanaal', badges: ['Direct deal aanmaken', 'Gem. €8.978 / deal'],
+              steps: [
+                { n: 1, action: 'Stem af met de partner', detail: 'Vraag wat de lead al weet, wat de verwachting is en wat jouw rol is. Vraag om een warm intro-mailtje.', timing: 'Direct' },
+                { n: 2, action: 'Maak direct een deal aan — vul altijd het product in', detail: 'Deal Origin = Partner. Koppel de partner als geassocieerd bedrijf. Stadium = Opportunity.', timing: 'Direct' },
+                { n: 3, action: 'Neem contact op met de lead', detail: 'Open met de partnernaam als brug. Ga direct naar de situatie van de lead.', timing: 'Binnen 24 uur' },
+                { n: 4, action: 'Bepaal de samenwerking', detail: 'Wie is commercieel verantwoordelijk? Gezamenlijke demo? Offerte via de partner?', timing: 'Na eerste call' },
+                { n: 5, action: 'Houd de partner actief in de loop', detail: 'De partner is je ambassadeur. Informeer bij elke stap. Notificatie bij Closed Won.', timing: 'Continu' },
+              ],
+              tipsLabel: 'Tips', tips: ['Dubbel werk beschadigt de partnerrelatie — vraag altijd eerst wat er al besproken is.', 'Partnerdeals zijn de sterkste bron — behandel ze als hoogste prioriteit.', 'Partner-leads krijgen automatisch het label High Intent en overrulen de normale productowner-toewijzing.'],
+              hsFields: ['Deal Origin: Partner', 'Partner geassocieerd bedrijf', 'Rol partner', 'Partner geïnformeerd j/n'],
+              autoAssign: 'Het High Intent-label overrult de normale producttoewijzing. Het product wordt automatisch als productline item toegevoegd bij het aanmaken van de deal.',
+              warn: 'Let op auto-toewijzing: de geautomatiseerde HubSpot-flow wijst partner-leads direct toe aan een productowner, zonder de handmatige afstemmingsstap. Spreek af hoe de partner geïnformeerd blijft — en of CS betrokken blijft of overruled wordt.' },
+            { id: 'cs', icon: 'heart', name: 'Customer Success', sub: 'Cross-sell signaal vanuit een bestaande klant', badges: ['Direct deal aanmaken', 'Cross-sell pipeline'],
+              steps: [
+                { n: 1, action: 'CS signaleert de kans', detail: 'CS maakt een taak voor je aan. Vraag: welk product, wat is de aanleiding, hoe verloopt de klantrelatie?', timing: 'Direct' },
+                { n: 2, action: 'Maak direct een deal aan in de Cross-sell pipeline', detail: 'Pipeline = Existing Business. Deal Origin = Customer Success. Koppel CS als betrokkene. Vul altijd het product in.', timing: 'Direct' },
+                { n: 3, action: 'Neem contact op — CS blijft betrokken', detail: 'Eerste contact binnen 24 uur. Klant kent Spotler al — sla de basisintro over, ga direct naar meerwaarde.', timing: 'Binnen 24 uur' },
+                { n: 4, action: 'Kwalificeer of de inschatting van CS klopt', detail: 'CS signaleerde de kans, maar toets zelf: past het product bij de use case, is er een concreet pijnpunt, is de timing reëel? Stuur terug naar CS als het niet klopt.', timing: 'Eerste gesprek' },
+              ],
+              tipsLabel: 'Tips', tips: ['Klant kent Spotler al — ga direct naar waarde, sla de basisintro over.', 'CS is jouw interne champion — houd ze actief in de loop.'],
+              hsFields: ['Deal Origin: Customer Success', 'Pipeline: Existing Business', 'CS-betrokkene', 'XS-product'],
+              autoAssign: 'Account-based check (stap 0): de bestaande sales-owner krijgt de lead automatisch terug — een CS-owner wordt hierbij overruled. Het product wordt automatisch als productline item toegevoegd bij het aanmaken van de deal.' },
+            { id: 'network', icon: 'briefcase', name: 'Own Network', sub: 'LinkedIn, evenementen, referrals', badges: ['Direct deal aanmaken'],
+              steps: [
+                { n: 1, action: 'Identificeer de kans en noteer de haak', detail: 'LinkedIn-interactie, evenementgesprek of referral. Kans om direct te kwalificeren? Plan dan meteen een afspraak — wacht niet.', timing: 'Direct' },
+                { n: 2, action: 'Maak direct een deal aan — vul altijd het product in', detail: 'Deal Origin = Own Network. Jij kent de context — direct op Opportunity.', timing: 'Direct' },
+                { n: 3, action: 'Eerste contact zoals afgesproken, of bel binnen 24 uur', detail: 'Niets afgesproken? Bel binnen 24 uur. Geen gehoor → voicemail binnen diezelfde 24 uur, dan een e-mail. Refereer aan jullie gedeelde context.', timing: 'Binnen 24 uur' },
+                { n: 4, action: 'Kwalificeer en plan een afspraak', detail: 'Check pijn, budget en timing. Bij een referral: bedank de doorverwijzer en sluit de loop na contact.', timing: 'Eerste gesprek' },
+              ],
+              tipsLabel: 'Tips', tips: ['Events: leg leads direct na het event vast in HubSpot — geheugen vervaagt snel.', 'LinkedIn: warm op met interactie vóór je een call pusht.'],
+              hsFields: ['Deal Origin: Own Network', 'Context: event/LinkedIn/referral', 'Eerste contactdatum'],
+              autoAssign: 'Stap 0 (account-based) checkt eerst op een bestaande owner. Geen match → round-robin op product. Het product wordt automatisch als productline item toegevoegd bij het aanmaken van de deal.' },
+            { id: 'outbound', icon: 'target', name: 'Outbound / SDR', sub: 'Eigen initiatie zonder voorafgaande relatie', badges: ['Na interesse: deal aanmaken', 'Proces onder review'],
+              steps: [
+                { n: 1, action: 'Selecteer de prospect op ICP-fit', detail: 'Controleer of het bedrijf past op het ICP van Spotler. Bekijk LinkedIn en de website.', timing: 'Dag 1' },
+                { n: 2, action: 'Eerste belpoging — max 45 sec. opener', detail: 'Wie je bent, waarom je specifiek dit bedrijf belt, wat de relevantie is.', timing: 'Dag 1' },
+                { n: 3, action: 'Voicemail + e-mail bij geen gehoor', detail: 'Voicemail: naam, bedrijf, reden van relevantie. E-mail: kort en persoonlijk met haak.', timing: 'Zelfde dag' },
+                { n: 4, action: 'LinkedIn-connectieverzoek', detail: 'Persoonlijk bericht met referentie aan je belpoging of e-mail.', timing: 'Dag 2–3' },
+                { n: 5, action: 'Tweede belpoging + afsluitmail', detail: 'Laatste poging. Break-up mail bij geen reactie. Interesse → deal aanmaken, altijd met product.', timing: 'Dag 5–7' },
+              ],
+              tipsLabel: 'Tips', tips: ['SDR-proces staat onder review — meld inzichten bij je salesmanager.', 'Multi-channel (bellen + mail + LinkedIn) verhoogt de contactkans significant.'],
+              hsFields: ['Deal Origin: SDR', 'ICP-fit check', 'Kanalen gebruikt', 'Sequentie-stap'],
+              autoAssign: 'Geen productmatch of leeg → fallback round-robin over het hele NB-team (exclusief Harry). Het product wordt automatisch als productline item toegevoegd bij het aanmaken van de deal.' },
+            { id: 'leadinfo', icon: 'eye', name: 'Leadinfo', sub: 'Websitesignalen — behandel als outbound', badges: ['Koud signaal'],
+              steps: [
+                { n: 1, action: 'Beoordeel het signaal op intentie', detail: "Welke pagina's, hoe lang, hoe vaak? Hoge herhaling + productpagina = sterker signaal.", timing: 'Dag 0' },
+                { n: 2, action: 'Zoek de juiste contactpersoon', detail: 'LinkedIn: beslisser of beïnvloeder. Check HubSpot op bestaande records. Bepaal ICP-fit.', timing: 'Dag 1' },
+                { n: 3, action: 'Outreach als outbound', detail: 'Noem niet dat je weet dat ze de site bezochten. Gebruik hun branche als invalshoek.', timing: 'Dag 1–2' },
+                { n: 4, action: 'Volg het outbound-protocol', detail: 'Zelfde tijdlijn als Outbound/SDR. Interesse → deal aanmaken, altijd met product.', timing: 'Dag 1–7' },
+              ],
+              tipsLabel: 'Let op', tips: ['Leadinfo-leads die ook een formulier invullen zijn wél warme inbound — gebruik dan het Marketing-protocol.'],
+              hsFields: ['Deal Origin: Marketing (Leadinfo)', 'Intentiescore', "Bezochte pagina's"],
+              autoAssign: 'Zelfde routing als Outbound/SDR: round-robin op product, fallback over het NB-team bij geen match.' },
+          ] },
+      ] },
+      { id: 'qualifying', icon: 'filter', title: 'Qualifying', blurb: 'Bevestig echte pijn en fit voordat je de demo boekt.', items: ['Discovery- en pijnscripts', 'Bezwaarafhandeling', 'Escalatieroutes'], richItems: [] },
+      { id: 'demoing', icon: 'presentation', title: 'Demoing', blurb: 'Laat de ene use case zien die past bij hun gekwalificeerde pijn.', items: ["Use cases", 'Productkaarten', "Video's"], richItems: [
+        { isLinks: true, title: 'Demo-omgevingen', caption: 'Deze twee tools zijn de daadwerkelijke demo-omgeving binnen dit playbook — geen apart sandbox-account nodig.',
+          links: [
+            { id: 'useCases', icon: 'lightbulb', label: 'Use cases', desc: 'Blader door de use-case bibliotheek en kies de case die past bij hun gekwalificeerde pijn.' },
+            { id: 'demoStudio', icon: 'monitor-play', label: 'Demo Studio', desc: 'Open de sales demo-tool om de gekozen use case live te laten zien.' },
+          ] },
+        { isSingleScript: true, title: 'Kwalificatiescript · vóór de demo',
+          ruleText: 'De regel: bevestig de exacte use case vóórdat je de demo boekt. Kan het prospect die niet benoemen, dan is de demo nog niet klaar om in te plannen.',
+          scriptLabel: 'Belscript: bij de demo-aanvraag',
+          scriptBody: "Goedemiddag, [naam]! Je hebt een demo aangevraagd — geweldig dat je dat doet, fijn om kennis te maken.\n\nVoordat ik de demo inplan, wil ik hem echt zo nuttig mogelijk voor je maken. Mag ik je een paar korte vragen stellen?\n\n→ Wat is voor jou de aanleiding om nu naar een oplossing als Spotler te kijken?\n→ Wie gebruikt de tool straks in jullie organisatie, en wie is er bij de beslissing betrokken?\n→ Zijn er specifieke dingen die je absoluut wilt zien in de demo?\n\nMooi — dan bouw ik de demo helemaal rondom [hun situatie]. Wanneer schikt het je het beste?" },
+      ] },
+      { id: 'proposing', icon: 'file-check', title: 'Proposing & closing', blurb: 'Maak van een afgesproken use case een getekende deal.', items: ['Cross-sell paden'], richItems: [
+        { isTable: true, isScript: false,
+          title: 'Prijsgids · NB & EB mediaan MRR',
+          caption: 'Medianen van NL enkel-product Closed Won deals uit de laatste 12 maanden. NB is de mediaan MRR voor een nieuwe klant. EB is de mediaan MRR-verandering bij een bestaande klant, bij cross-sell of upsell. Gebruik dit als startpunt bij Opportunity en pas het aan zodra de werkelijke prijs bekend is.',
+          warningText: 'BrandID staat in het portfolio maar heeft nu geen toegewezen eigenaar in de toewijzingslogica, dus valt het in de fallback. Leg vast wie dit product commercieel beheert voor het NL-team.',
+          rows: [
+            { product: 'Activate', desc: 'CDP & personalisatie · Commerce', nb: '€890', eb: '€250', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'var(--cyan-tint)' },
+            { product: 'BrandID', desc: 'Brand management', nb: '—', eb: '—', typeLabel: 'Geen eigenaar', typeTone: 'warning', rowBg: 'transparent' },
+            { product: 'CRM', desc: 'CRM-module', nb: '€75', eb: '€48', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'transparent' },
+            { product: 'Engage', desc: 'Marketing automation / engagement', nb: '€350', eb: '€200', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'transparent' },
+            { product: 'Mail+', desc: 'E-mail marketing automation · grootste klantbasis', nb: '€220', eb: '€164', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'var(--cyan-tint)' },
+            { product: 'Mail Pro', desc: 'E-mail · Pro-tier', nb: '€150', eb: '€150', typeLabel: 'NB + XS · Jasper Koenraad', typeTone: 'neutral', rowBg: 'transparent' },
+            { product: 'Send Pro', desc: 'Transactional e-mail · NB & XS', nb: '€299', eb: '€256', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'transparent' },
+            { product: 'Spotler FeedbackPro', desc: 'Customer feedback · geavanceerd', nb: '€250', eb: '€188', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'var(--cyan-tint)' },
+            { product: 'Spotler Feedback', desc: 'Customer feedback · basis', nb: '€100', eb: '€100', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'transparent' },
+            { product: 'Activate Search', desc: 'Onsite search · add-on bij Activate', nb: '€157', eb: '€125', typeLabel: 'Add-on', typeTone: 'neutral', rowBg: 'transparent' },
+            { product: 'Aigent', desc: 'AI-agent / conversational', nb: '€240', eb: '€240', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'transparent' },
+            { product: 'Eazy', desc: 'E-mailmarketing · eenvoudig segment', nb: '€227', eb: '€175', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'transparent' },
+            { product: 'Momice', desc: 'Event management platform', nb: '€258', eb: '€204', typeLabel: 'Jasper Werkman', typeTone: 'neutral', rowBg: 'transparent' },
+          ] },
+        { isTable: false, isScript: true,
+          title: 'Closing scripts · vervolgstap-discipline',
+          ruleText: "De regel: boek de vervolgstap altijd tijdens het gesprek. Nooit 'ik stuur je de info' of 'ik zorg dat je dat op [datum] hebt'. Dat is precies waarom deals stil vallen.",
+          callLabel: 'Belscript: na de demo',
+          callScript: "Hey [naam], fijn dat je vandaag tijd had voor de demo! Wat vond je ervan, zijn er dingen die je aanspreken?\n\n[Luister en vraag door]\n\nOp basis van wat je net vertelde, stel ik voor dat we [de offerte doornemen / een technisch gesprek inplannen / dit met je collega's bespreken]. Zullen we dat nu meteen inplannen? Ik heb [dag] om [tijd] of [dag] om [tijd], wat werkt voor jou?\n\n[Bevestig de dag en tijd hardop en zet het gelijk in de agenda]\n\nTop, dan spreken we [dag] om [tijd] over [het concrete onderwerp]. Ik zet de uitnodiging nu in je agenda.",
+          emailLabel: 'E-mail: na de demo',
+          emailSubject: 'Bevestiging: [vervolgstap] op [datum] om [tijd]',
+          emailBody: "Hi [naam],\n\nBedankt voor je tijd vandaag, wat fijn dat je de gelegenheid nam om Spotler van dichtbij te zien. Ik vond het een interessant gesprek!\n\nWat ik heb meegenomen uit onze demo:\n· [Kernbehoefte 1 die naar voren kwam]\n· [Kernbehoefte 2]\n· [Eventueel punt van zorg of openstaande vraag]\n\nZoals afgesproken tijdens de demo: [vervolgstap, bijvoorbeeld 'ik neem de offerte met je door'] op [datum] om [tijd]. Ik heb de uitnodiging al verstuurd, tot dan!\n\nHeb je in de tussentijd nog vragen? Ik hoor het graag.\n\n[naam]\nSpotler" },
+      ] },
+      { id: 'retaining', icon: 'heart-handshake', title: 'Retaining', blurb: 'Houd het account gezond en laat het groeien na de deal.', items: ['Battlecards', 'Klaviyo story', 'Save plays'], richItems: [] },
+    ],
+  },
+  en: {
+    viewingAs: 'Viewing as',
+    hi: 'Hi',
+    points: 'coaching points',
+    funnelTitle: 'Funnel: you vs. team',
+    you: 'you',
+    team: 'Team',
+    panelsTitle: 'Coaching panels',
+    hoverHint: 'Hover a panel for the leaderboard',
+    teamAvg: 'Team average',
+    leaderboardTitle: 'Leaderboard:',
+    leaderboardFooter: 'Names below the top half are hidden until you climb the board.',
+    dataAsOf: 'Data as of',
+    period_week: 'Last week',
+    period_month: 'Last month',
+    period_quarter: 'Last quarter',
+    vsLastWeek: 'vs last week',
+    vsPrevPeriod: 'vs previous period',
+    periodWordWeek: 'this week',
+    periodWordMonth: 'this month',
+    periodWordQuarter: 'this quarter',
+    navHome: 'Home',
+    navTeam: 'Team',
+    navToolkit: 'Toolkit',
+    navUseCases: 'Use cases',
+    navDemoStudio: 'Demo Studio',
+    navHelp: 'Help',
+    repRole: 'Rep',
+    toolkitTitle: 'Toolkit',
+    toolkitSub: 'Everything you need, organised by funnel stage.',
+    searchPlaceholder: 'Search...',
+    backToToolkit: 'Back to Toolkit',
+    comingSoon: 'Coming soon',
+    notBuiltYet: 'This section is not built yet this session.',
+    exitDemoStudio: 'Back to Playbook',
+    rulesTitle: 'Key rules',
+    rules: [
+      { badgeLabel: 'Mandatory', title: 'Cross-sell lead split', desc: 'When a cross-sell lead is handed over and the deal is won, 25% of the deal goes to the colleague who brought in the lead. The rep who picks up and closes the lead receives the remaining 75%.' },
+      { badgeLabel: 'Mandatory', title: 'Maximum discount on your own initiative', desc: "On your own initiative you may give a maximum of 15% discount. Higher discounts require your manager's approval." },
+    ],
+    closedLostTitle: 'Closed-Lost reasons',
+    closedLostReasons: ['Competition', 'Price', 'No fit', 'Features', 'On Hold', 'Unreachable', 'Unknown'],
+    closedLostNote: "The reason is mandatory when closing a deal as Closed Lost. For Competition, name the competitor. 25% is On Hold — consider a 90-180 day recheck cadence.",
+    contactsTitle: 'Who to contact',
+    owner: { name: 'Glenn', role: 'Playbook owner · Chief Revenue Officer', desc: 'Glenn holds final responsibility for the content, structure and strategic choices in this playbook, including the assignment logic, product ownership and prioritisation of action points.' },
+    contacts: [
+      { name: 'Manuela Crielaard', desc: 'Point of contact for questions, comments or changes to the playbook.' },
+      { name: 'Sjoerd de Jong', desc: 'Point of contact for questions, comments or changes to the playbook.' },
+      { name: 'Robbert Brouwer', desc: 'Point of contact for questions, comments or changes to the playbook.' },
+    ],
+    contactsFooter: 'Spotted a correction or addition, or something that is no longer accurate? Contact Manuela, Sjoerd or Robbert. They collect feedback and align changes with Glenn.',
+    tableProduct: 'Product', tableDesc: 'Description', tableNb: 'NB median MRR', tableEb: 'EB median MRR change', tableType: 'Type',
+    stageQualified: 'Qualified',
+    stageDemo: 'Demo',
+    stageProposal: 'Proposal',
+    stageClosedWon: 'Closed won',
+    panelDiscoveryTitle: 'Discovery & qualification',
+    panelDiscoverySub: 'Qualify their real pain in the first call',
+    panelDiscoveryAction: "When they name a pain, ask what it's costing them day to day, twice, before moving to product.",
+    panelUsecaseTitle: 'Use case scoping',
+    panelUsecaseSub: 'Open every demo with one agreed use case',
+    panelUsecaseAction: "Get the prospect to agree the exact use case before you book the demo. If they can't name it, the demo isn't ready to book.",
+    panelMultiTitle: 'Multithreading',
+    panelMultiSub: 'Engage a second stakeholder before the demo',
+    panelMultiAction: 'Ask who else feels this pain or would be affected, and get the intro before the demo. One-contact deals are the easiest to go quiet.',
+    panelNextstepTitle: 'Next-step discipline',
+    panelNextstepSub: 'End every call with a dated, owned next step',
+    panelNextstepAction: "State the next step out loud before you hang up and get them to confirm the date. A vague 'I'll check back in' is why deals stall silently.",
+    programDay: (w, d, len) => `week ${w}, day ${d} of ${len}`,
+    streakLabel: (n) => `${n}-week streak`,
+    navProducts: 'Products',
+    quickActions: [
+      { icon: 'search', title: 'New lead in?', sub: 'Open the follow-up protocol per source', stageId: 'prospecting' },
+      { icon: 'filter', title: 'Ready to qualify?', sub: 'Open the discovery and pain scripts', stageId: 'qualifying' },
+      { icon: 'presentation', title: 'Booking a demo?', sub: 'Grab the qualification script and demo links', stageId: 'demoing' },
+      { icon: 'file-check', title: 'Closing a deal?', sub: 'Open the pricing guide and closing scripts', stageId: 'proposing' },
+    ],
+    pipelineHealthTitle: 'Pipeline health — team', pipelineHealthNote: 'Fixed analysis, Commercial Team NL · not tied to the period selector above.',
+    pipelineHealth: [
+      { icon: 'trending-up', label: 'Win rate Partner', value: '88%', sub: 'Highest ROI — avg €8,978/deal', tone: 'success' },
+      { icon: 'trending-down', label: 'Win rate Marketing', value: '15%', sub: 'Fast follow-up is critical', tone: 'warning' },
+      { icon: 'alert-triangle', label: 'Stuck deals >60d', value: '84', sub: '€1.03M polluted forecast', tone: 'danger' },
+      { icon: 'euro', label: 'MRR missing', value: '45%', sub: 'Deals missing a product line item', tone: 'info' },
+    ],
+    admin: {
+      title: 'Admin', sub: 'Lead routing, product ownership and assignment logic — reference for admins.',
+      routingTitle: 'Automatic lead assignment — full schema', routingBadge: 'Step 0 + 2 + fallback + priority = NL',
+      routingCaption: 'The full HubSpot assignment flow as technically built. Step 1 (region gate) is shown for completeness but is not an NL process — non-Dutch-speaking leads go to the regional teams. The NL team works with step 0, step 2, the fallback and the priority layer.',
+      routingSteps: [
+        { n: '0', action: 'Account-based check — "Does the company already have an owner?"', detail: 'Yes, sales owner → the lead routes to that owner automatically (end of flow). No, or CS owner → on to step 1. Note: a CS owner is overruled here — agree with your team whether CS stays informed.', tag: 'NL-relevant', bg: 'var(--cyan-tint)', opacity: '1' },
+        { n: '1', action: 'Region gate — "Determine language + region" (not an NL process)', detail: 'Non-NL leads are routed away here: Spanish/French → Nicolas · German → Peter Proft · Nordics → Per Kittel · Eastern Europe + Italy → Alen Corkovic · UK/Ireland → English team · Other → AI decides. NL leads continue to step 2.', tag: 'Other region', bg: 'var(--off-white)', opacity: '0.7' },
+        { n: '2', action: 'Product assignment (NL) — round-robin by requested product', detail: 'See the product-owner table below. No match or empty → fallback round-robin across the whole NB team (excluding Harry).', tag: 'NL-relevant', bg: 'var(--cyan-tint)', opacity: '1' },
+      ],
+      fallbackTitle: 'Fallback round-robin', fallbackText: 'On no product match or an empty product field: the lead goes round-robin across the whole NB team, excluding Harry.',
+      priorityTitle: 'Priority layer — High Intent', priorityText: 'A Partner lead gets the High Intent label and overrides normal product-owner assignment. Separate from the win-rate prioritisation (Partner = 88%) — a distinct routing rule.',
+      ownerTableTitle: 'Product owners NL — round-robin assignment', ownerColProduct: 'Product', ownerColOwner: 'Owner(s)', noOwnerBadge: 'No owner — fallback',
+      ownerComboNote: 'Combining products: not yet defined how a lead with multiple product interests gets assigned. Until that rule exists: manual check by the teamlead for multi-product leads.',
+    },
+    stages: [
+      { id: 'prospecting', icon: 'search', title: 'Prospecting', blurb: 'Find and route the right leads before the first call.', items: ['First-touch scripts', 'Timeline'], richItems: [
+        { isProtocols: true, title: 'Lead-source protocols', caption: 'Click a source for the steps, tips and HubSpot fields.',
+          sources: [
+            { id: 'marketing', icon: 'megaphone', name: 'Inbound / Marketing', sub: 'Website form, SEO, campaign', badges: ['No deal before interest', 'Call within 1 hour'],
+              steps: [
+                { n: 1, action: 'Check the form and context', detail: 'See which form was filled in. Look up the company in HubSpot and LinkedIn. Note one relevant hook.', timing: 'Immediately' },
+                { n: 2, action: 'Send a personalised email', detail: 'Name the form type, include your contact details, offer two time slots.', timing: 'T+0' },
+                { n: 3, action: 'Call the lead', detail: 'Opener: your name, Spotler, and the form they filled in. Ask open questions. Goal: qualify and book a meeting.', timing: 'T+1 hour' },
+                { n: 4, action: 'Second call attempt + voicemail', detail: 'Try a different time. Voicemail: short and personal, refer to your email.', timing: 'T+24 hours' },
+                { n: 5, action: 'Third call attempt', detail: 'Last attempt. Interest confirmed → create the deal at Opportunity. Always fill in the product — no product means no deal value. No response → step 6.', timing: 'T+48 hours' },
+                { n: 6, action: 'Auto reminder #2 → Closed Lost', detail: 'After T+72 hours with no response: Closed Lost — Unreachable. Log every attempt in HubSpot.', timing: 'T+72 hours' },
+              ],
+              tipsLabel: 'Tips', tips: ["Name the specific form the lead filled in — it creates instant recognition.", "Don't create a deal before confirmed interest — it pollutes the pipeline.", 'Pricing requests are further along the buyer journey — prioritise them over contact forms.'],
+              hsFields: ['Deal Origin: Marketing', 'Lead status: New → Attempting', 'Form type', 'Qualification notes', 'Next step + date'],
+              autoAssign: 'Step 0 (account-based) checks for an existing owner first. No match → step 2: round-robin by requested product. The product is auto-added as a line item when the deal is created.' },
+            { id: 'partner', icon: 'handshake', name: 'Partner / Reseller', sub: 'Referred through the partner channel', badges: ['Create deal immediately', 'Avg €8,978 / deal'],
+              steps: [
+                { n: 1, action: 'Align with the partner', detail: 'Ask what the lead already knows, what they expect, and what your role is. Ask for a warm intro email.', timing: 'Immediately' },
+                { n: 2, action: 'Create the deal immediately — always fill in the product', detail: 'Deal Origin = Partner. Link the partner as an associated company. Stage = Opportunity.', timing: 'Immediately' },
+                { n: 3, action: 'Contact the lead', detail: "Open with the partner's name as the bridge. Go straight to the lead's situation.", timing: 'Within 24 hours' },
+                { n: 4, action: 'Agree the way of working', detail: "Who's commercially responsible? Joint demo? Quote through the partner?", timing: 'After first call' },
+                { n: 5, action: 'Keep the partner in the loop', detail: 'The partner is your advocate. Update them at every step. Notify them on Closed Won.', timing: 'Ongoing' },
+              ],
+              tipsLabel: 'Tips', tips: ["Duplicate outreach damages the partner relationship — always ask what's already been discussed.", 'Partner deals are the strongest source — treat them as top priority.', 'Partner leads automatically get the High Intent label and override normal product-owner assignment.'],
+              hsFields: ['Deal Origin: Partner', 'Partner associated company', "Partner's role", 'Partner informed y/n'],
+              autoAssign: 'The High Intent label overrides normal product assignment. The product is auto-added as a line item when the deal is created.',
+              warn: "Watch the auto-assignment: HubSpot's automated flow routes partner leads straight to a product owner, skipping the manual alignment step. Agree how the partner stays informed — and whether CS stays involved or gets overruled." },
+            { id: 'cs', icon: 'heart', name: 'Customer Success', sub: 'Cross-sell signal from an existing customer', badges: ['Create deal immediately', 'Cross-sell pipeline'],
+              steps: [
+                { n: 1, action: 'CS flags the opportunity', detail: "CS creates a task for you. Ask: which product, what triggered it, how's the customer relationship going?", timing: 'Immediately' },
+                { n: 2, action: 'Create the deal in the Cross-sell pipeline', detail: 'Pipeline = Existing Business. Deal Origin = Customer Success. Link CS as involved. Always fill in the product.', timing: 'Immediately' },
+                { n: 3, action: 'Make contact — CS stays involved', detail: 'First contact within 24 hours. The customer already knows Spotler — skip the basic intro, go straight to value.', timing: 'Within 24 hours' },
+                { n: 4, action: "Verify CS's read yourself", detail: "CS flagged the opportunity, but check it holds up: does the product fit the use case, is there a concrete pain point, is the timing real? Send it back to CS if it doesn't.", timing: 'First call' },
+              ],
+              tipsLabel: 'Tips', tips: ['The customer already knows Spotler — go straight to value, skip the basic intro.', 'CS is your internal champion — keep them actively in the loop.'],
+              hsFields: ['Deal Origin: Customer Success', 'Pipeline: Existing Business', 'CS contact', 'XS product'],
+              autoAssign: 'Account-based check (step 0): the existing sales owner automatically gets the lead back — a CS owner is overruled here. The product is auto-added as a line item when the deal is created.' },
+            { id: 'network', icon: 'briefcase', name: 'Own Network', sub: 'LinkedIn, events, referrals', badges: ['Create deal immediately'],
+              steps: [
+                { n: 1, action: 'Identify the opportunity and note the hook', detail: "LinkedIn interaction, event conversation or referral. Chance to qualify on the spot? Book the meeting right away — don't wait.", timing: 'Immediately' },
+                { n: 2, action: 'Create the deal immediately — always fill in the product', detail: 'Deal Origin = Own Network. You know the context — straight to Opportunity.', timing: 'Immediately' },
+                { n: 3, action: 'First contact as agreed, or call within 24 hours', detail: 'Nothing agreed? Call within 24 hours. No answer → voicemail within the same 24 hours, then an email. Reference your shared context.', timing: 'Within 24 hours' },
+                { n: 4, action: 'Qualify and book a meeting', detail: 'Check pain, budget and timing. For a referral: thank the referrer and close the loop after contact.', timing: 'First call' },
+              ],
+              tipsLabel: 'Tips', tips: ['Events: log leads in HubSpot right after the event — memory fades fast.', 'LinkedIn: warm up with interaction before pushing for a call.'],
+              hsFields: ['Deal Origin: Own Network', 'Context: event/LinkedIn/referral', 'First contact date'],
+              autoAssign: 'Step 0 (account-based) checks for an existing owner first. No match → round-robin by product. The product is auto-added as a line item when the deal is created.' },
+            { id: 'outbound', icon: 'target', name: 'Outbound / SDR', sub: 'Own initiative, no prior relationship', badges: ['After interest: create deal', 'Process under review'],
+              steps: [
+                { n: 1, action: 'Select the prospect on ICP fit', detail: "Check the company fits Spotler's ICP. Review LinkedIn and the website.", timing: 'Day 1' },
+                { n: 2, action: 'First call attempt — max 45-second opener', detail: "Who you are, why you're calling this specific company, why it's relevant.", timing: 'Day 1' },
+                { n: 3, action: 'Voicemail + email if no answer', detail: 'Voicemail: name, company, reason it matters. Email: short and personal with a hook.', timing: 'Same day' },
+                { n: 4, action: 'LinkedIn connection request', detail: 'Personal note referencing your call or email.', timing: 'Day 2–3' },
+                { n: 5, action: 'Second call attempt + break-up email', detail: 'Last attempt. Break-up email if no response. Interest → create the deal, always with a product.', timing: 'Day 5–7' },
+              ],
+              tipsLabel: 'Tips', tips: ['The SDR process is under review — flag insights to your sales manager.', 'Multi-channel (call + email + LinkedIn) significantly raises contact odds.'],
+              hsFields: ['Deal Origin: SDR', 'ICP-fit check', 'Channels used', 'Sequence step'],
+              autoAssign: 'No product match or empty field → fallback round-robin across the whole NB team (excluding Harry). The product is auto-added as a line item when the deal is created.' },
+            { id: 'leadinfo', icon: 'eye', name: 'Leadinfo', sub: 'Website signals — treat as outbound', badges: ['Cold signal'],
+              steps: [
+                { n: 1, action: 'Assess the signal for intent', detail: 'Which pages, how long, how often? High repeat visits + a product page = a stronger signal.', timing: 'Day 0' },
+                { n: 2, action: 'Find the right contact', detail: 'LinkedIn: decision-maker or influencer. Check HubSpot for existing records. Assess ICP fit.', timing: 'Day 1' },
+                { n: 3, action: 'Reach out as outbound', detail: "Don't mention that you know they visited the site. Use their industry as the angle.", timing: 'Day 1–2' },
+                { n: 4, action: 'Follow the outbound protocol', detail: 'Same timeline as Outbound/SDR. Interest → create the deal, always with a product.', timing: 'Day 1–7' },
+              ],
+              tipsLabel: 'Note', tips: ['Leadinfo leads who also fill in a form are warm inbound — use the Marketing protocol instead.'],
+              hsFields: ['Deal Origin: Marketing (Leadinfo)', 'Intent score', 'Pages visited'],
+              autoAssign: 'Same routing as Outbound/SDR: round-robin by product, fallback across the NB team on no match.' },
+          ] },
+      ] },
+      { id: 'qualifying', icon: 'filter', title: 'Qualifying', blurb: 'Confirm real pain and fit before you book the demo.', items: ['Discovery and pain scripts', 'Objection handling', 'Escalation routing'], richItems: [] },
+      { id: 'demoing', icon: 'presentation', title: 'Demoing', blurb: 'Show the one use case that matches their qualified pain.', items: ['Use cases', 'Product cards', 'Videos'], richItems: [
+        { isLinks: true, title: 'Demo environments', caption: 'These two tools are the actual demo environment inside this playbook — no separate sandbox account needed.',
+          links: [
+            { id: 'useCases', icon: 'lightbulb', label: 'Use cases', desc: 'Browse the use-case library and pick the case that matches their qualified pain.' },
+            { id: 'demoStudio', icon: 'monitor-play', label: 'Demo Studio', desc: 'Open the sales demo tool to show the chosen use case live.' },
+          ] },
+        { isSingleScript: true, title: 'Qualification script · before the demo',
+          ruleText: "The rule: confirm the exact use case before you book the demo. If the prospect can't name it, the demo isn't ready to schedule.",
+          scriptLabel: 'Call script: on the demo request',
+          scriptBody: "Good afternoon, [name]! You requested a demo — great that you did, looking forward to meeting you.\n\nBefore I schedule the demo, I want to make it as useful as possible for you. Can I ask a few quick questions?\n\n→ What's prompting you to look at a solution like Spotler right now?\n→ Who will be using the tool in your organisation, and who's involved in the decision?\n→ Is there anything specific you absolutely want to see in the demo?\n\nGreat — then I'll build the demo entirely around [their situation]. When works best for you?" },
+      ] },
+      { id: 'proposing', icon: 'file-check', title: 'Proposing & closing', blurb: 'Turn an agreed use case into a signed deal.', items: ['Cross-sell paths'], richItems: [
+        { isTable: true, isScript: false,
+          title: 'Pricing guide · NB & EB median MRR',
+          caption: 'Medians of NL single-product Closed Won deals from the last 12 months. NB is the median MRR for a new customer. EB is the median MRR change for an existing customer, on cross-sell or upsell. Use this as a starting point at Opportunity stage and adjust once the real price is known.',
+          warningText: 'BrandID is in the portfolio but currently has no assigned owner in the assignment logic, so it falls into the fallback. Confirm who commercially owns this product for the NL team.',
+          rows: [
+            { product: 'Activate', desc: 'CDP & personalisation · Commerce', nb: '€890', eb: '€250', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'var(--cyan-tint)' },
+            { product: 'BrandID', desc: 'Brand management', nb: '—', eb: '—', typeLabel: 'No owner', typeTone: 'warning', rowBg: 'transparent' },
+            { product: 'CRM', desc: 'CRM module', nb: '€75', eb: '€48', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'transparent' },
+            { product: 'Engage', desc: 'Marketing automation / engagement', nb: '€350', eb: '€200', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'transparent' },
+            { product: 'Mail+', desc: 'Email marketing automation · largest customer base', nb: '€220', eb: '€164', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'var(--cyan-tint)' },
+            { product: 'Mail Pro', desc: 'Email · Pro tier', nb: '€150', eb: '€150', typeLabel: 'NB + XS · Jasper Koenraad', typeTone: 'neutral', rowBg: 'transparent' },
+            { product: 'Send Pro', desc: 'Transactional email · NB & XS', nb: '€299', eb: '€256', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'transparent' },
+            { product: 'Spotler FeedbackPro', desc: 'Customer feedback · advanced', nb: '€250', eb: '€188', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'var(--cyan-tint)' },
+            { product: 'Spotler Feedback', desc: 'Customer feedback · basic', nb: '€100', eb: '€100', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'transparent' },
+            { product: 'Activate Search', desc: 'Onsite search · add-on to Activate', nb: '€157', eb: '€125', typeLabel: 'Add-on', typeTone: 'neutral', rowBg: 'transparent' },
+            { product: 'Aigent', desc: 'AI agent / conversational', nb: '€240', eb: '€240', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'transparent' },
+            { product: 'Eazy', desc: 'Email marketing · simple segment', nb: '€227', eb: '€175', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'transparent' },
+            { product: 'Momice', desc: 'Event management platform', nb: '€258', eb: '€204', typeLabel: 'Jasper Werkman', typeTone: 'neutral', rowBg: 'transparent' },
+          ] },
+        { isTable: false, isScript: true,
+          title: 'Closing scripts · next-step discipline',
+          ruleText: "The rule: always book the next step during the call. Never 'I'll send you the info' or 'I'll make sure you have that by [date]'. That's exactly why deals stall silently.",
+          callLabel: 'Call script: after the demo',
+          callScript: "Hey [name], great that you had time for the demo today! What did you think, is there anything that stood out to you?\n\n[Listen and dig deeper]\n\nBased on what you just told me, I suggest we [go through the proposal / set up a technical call / discuss this with your colleagues]. Shall we lock that in right now? I have [day] at [time] or [day] at [time], what works for you?\n\n[Confirm the day and time out loud and add it to the calendar on the spot]\n\nGreat, so we'll speak [day] at [time] about [the concrete topic]. I'm adding the invite to your calendar now.",
+          emailLabel: 'Email: after the demo',
+          emailSubject: 'Confirmed: [next step] on [date] at [time]',
+          emailBody: "Hi [name],\n\nThanks for your time today, great that you took the chance to see Spotler close up. I enjoyed the conversation!\n\nWhat I took away from our demo:\n· [Core need 1 that came up]\n· [Core need 2]\n· [Any concern or open question]\n\nAs agreed during the demo: [next step, e.g. 'I'll go through the proposal with you'] on [date] at [time]. I've already sent the calendar invite, see you then!\n\nAny questions in the meantime? I'd love to hear them.\n\n[name]\nSpotler" },
+      ] },
+      { id: 'retaining', icon: 'heart-handshake', title: 'Retaining', blurb: 'Keep the account healthy and growing after close.', items: ['Battlecards', 'Klaviyo story', 'Save plays'], richItems: [] },
+    ],
+  },
+};
+
+function pct(x) { return `${Math.round(x * 100)}%`; }
+function initials(name) { return name.slice(0, 2).toUpperCase(); }
+const MONTHS = {
+  nl: ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'],
+  en: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+};
+function formatDate(iso, lang) {
+  const [y, m, d] = iso.split('-').map(Number);
+  return `${d} ${MONTHS[lang][m - 1]} ${y}`;
+}
+function targetLabel(lang, count, target, periodWord) {
+  return lang === 'nl' ? `${count} van ${target} doel ${periodWord}` : `${count} of ${target} target ${periodWord}`;
+}
+const OWNER_ROWS = [
+  { product: 'Activate', owner: 'Sjoerd de Jong, Rick Dekker', hasOwner: true },
+  { product: 'Commerce Cloud', owner: 'Boris Mileusnic', hasOwner: true },
+  { product: 'Mail+', owner: 'Manuela Crielaard, Marthijn Dam Wichers, Sander te Loo', hasOwner: true },
+  { product: 'MailPro', owner: 'Jasper Koenraad', hasOwner: true },
+  { product: 'CRM', owner: 'Marthijn Dam Wichers', hasOwner: true },
+  { product: 'SendPro', owner: 'Nick van Dijk · Manuela Crielaard', hasOwner: true },
+  { product: 'Message', owner: 'Boris Mileusnic', hasOwner: true },
+  { product: 'FeedbackPro', owner: 'Ivo Klein, Robbert Brouwer', hasOwner: true },
+  { product: 'Search', owner: 'Rick Dekker', hasOwner: true },
+  { product: 'Engage + Chat+', owner: 'Harry', hasOwner: true },
+  { product: 'Momice', owner: 'Jasper Werkman', hasOwner: true },
+  { product: 'BrandID', owner: '', hasOwner: false },
+];
+
+class Component extends DCLogic {
+  state = { lang: 'nl', viewerId: 'ivo', period: 'week', activePanelId: null, view: 'home', activeStage: null, toolkitExpanded: false, sidebarCollapsed: false, demoStudioFullscreen: false, expandedProtocolId: null };
+
+  componentDidMount() {
+    import('./playbook-data.js').then((mod) => {
+      this.dataModule = mod;
+      this.forceUpdate();
+    });
+    this.onDemoStudioMessage = (e) => {
+      if (e.data && e.data.source === 'spotler-demo-studio') {
+        this.setState({ demoStudioFullscreen: !!e.data.fullscreen });
+      }
+    };
+    window.addEventListener('message', this.onDemoStudioMessage);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('message', this.onDemoStudioMessage);
+  }
+
+  kebabToPascal(name) {
+    return name.split('-').map((s) => s.charAt(0).toUpperCase() + s.slice(1)).join('');
+  }
+
+  // Icons mount imperatively via ref instead of the global lucide.createIcons() DOM
+  // scan, which swaps <i> nodes for <svg> nodes behind React's back and crashes the
+  // reconciler ('removeChild ... not a child') the moment React tries to remove one.
+  // Memoized by name+size so an unchanged icon keeps a stable ref fn across renders.
+  getIconRef(name, size) {
+    if (!this._iconRefs) this._iconRefs = {};
+    const key = name + '|' + size;
+    if (this._iconRefs[key]) return this._iconRefs[key];
+    const pascal = this.kebabToPascal(name);
+    const fn = (node) => {
+      if (!node) return;
+      try {
+        const L = window.lucide;
+        const data = L && L.icons && L.icons[pascal];
+        if (!data) return;
+        node.innerHTML = '';
+        const svg = L.createElement(data, { width: size, height: size });
+        svg.style.display = 'block';
+        node.appendChild(svg);
+      } catch (e) {}
+    };
+    this._iconRefs[key] = fn;
+    return fn;
+  }
+
+  // Mounts the use-case tool as its OWN React root inside a leaf div our
+  // template never renders children into — same principle as the icon refs
+  // above: our React only ever owns the wrapper node, never its contents, so
+  // there is nothing for the two React trees to fight over on unmount.
+  mountUseCases = (node) => {
+    if (!node) {
+      if (this._ucRoot) { this._ucRoot.unmount(); this._ucRoot = null; }
+      return;
+    }
+    if (this._ucRoot || !window.UseCaseApp) return;
+    this._ucRoot = window.ReactDOM.createRoot(node);
+    this._ucRoot.render(window.React.createElement(window.UseCaseApp, { hideHeader: true, lang: this.state.lang }));
+  };
+
+  syncUseCaseLang() {
+    if (this._ucRoot && window.UseCaseApp) {
+      this._ucRoot.render(window.React.createElement(window.UseCaseApp, { hideHeader: true, lang: this.state.lang }));
+    }
+  }
+
+  renderVals() {
+    const lang = this.state.lang;
+    const T = I18N[lang];
+    const mod = this.dataModule;
+    const businessRules = T.rules;
+    const t_rulesTitle = T.rulesTitle;
+    const owner = { name: T.owner.name, role: T.owner.role, desc: T.owner.desc, initials: initials(T.owner.name) };
+    const contacts = T.contacts.map((c) => ({ name: c.name, desc: c.desc, initials: initials(c.name) }));
+    const isHelpView = this.state.view === 'help';
+    const onOpenHelp = () => this.setState({ view: 'help' });
+    const collapsed = this.state.sidebarCollapsed;
+    const sidebarExpanded = !collapsed;
+    const sidebarWidth = collapsed ? '76px' : '230px';
+    const collapseIcon = collapsed ? 'chevron-right' : 'chevron-left';
+    const onToggleCollapse = () => this.setState((s) => ({ sidebarCollapsed: !s.sidebarCollapsed }));
+    const collapseIconRef = this.getIconRef(collapseIcon, 12);
+    const powerIconRef = this.getIconRef('power', 15);
+    const sparklesIconRef = this.getIconRef('sparkles', 16);
+    const flameIconRef = this.getIconRef('flame', 14);
+    const clockIconRef = this.getIconRef('clock-4', 13);
+    const arrowRightIconRef = this.getIconRef('arrow-right', 14);
+    const trophyIconRef = this.getIconRef('trophy', 15);
+    const arrowLeftIconRef = this.getIconRef('arrow-left', 14);
+    const fileTextIconRef = this.getIconRef('file-text', 16);
+    const exitIconRef = this.getIconRef('x', 13);
+    const productsActive = this.state.view === 'admin';
+    const productsJustify = collapsed ? 'center' : 'flex-start';
+    const productsIconRef = this.getIconRef('package', 14);
+    const onOpenAdmin = () => this.setState({ view: 'admin' });
+    const productsBg = productsActive ? 'var(--cyan)' : 'rgba(255,255,255,0.05)';
+    const productsBorder = productsActive ? 'var(--cyan)' : 'rgba(255,255,255,0.22)';
+    const productsFg = productsActive ? '#ffffff' : 'rgba(255,255,255,0.8)';
+    const isAdminView = productsActive;
+    const goStage = (stageId) => this.setState({ view: 'stage', activeStage: stageId, toolkitExpanded: true });
+    const quickActions = T.quickActions.map((q) => ({ title: q.title, sub: q.sub, iconRef: this.getIconRef(q.icon, 18), onClick: () => goStage(q.stageId) }));
+    const toneColors = { success: 'var(--success)', warning: 'var(--warning)', danger: 'var(--danger)', info: 'var(--cyan-shade)' };
+    const pipelineHealth = T.pipelineHealth.map((p) => ({ label: p.label, value: p.value, sub: p.sub, color: toneColors[p.tone] || 'var(--fg2)', iconRef: this.getIconRef(p.icon, 15) }));
+    const ownerRows = OWNER_ROWS.map((r, i) => ({ product: r.product, owner: r.owner, hasOwner: r.hasOwner, noOwner: !r.hasOwner, rowBg: i % 2 === 1 ? 'var(--cyan-tint)' : 'transparent' }));
+
+    if (!mod) {
+      return {
+        navRows: [], repSelectOptions: [], periodOptions: [], funnelTiles: [], panels: [],
+        viewerInitials: '', viewerName: '', greeting: '', programDayLabel: '', pointsValue: '', t_points: T.points,
+        streakLabel: '', dataAsOfLabel: '', t_funnelTitle: T.funnelTitle, t_you: T.you, t_team: T.team,
+        t_panelsTitle: T.panelsTitle, t_hoverHint: T.hoverHint, t_teamAvg: T.teamAvg,
+        t_leaderboardTitle: T.leaderboardTitle, t_leaderboardFooter: T.leaderboardFooter, t_help: T.navHelp,
+        viewingAsLabel: T.viewingAs, viewerId: this.state.viewerId,
+        langVariant: { nl: this.state.lang === 'nl' ? 'dark' : 'ghost', en: this.state.lang === 'en' ? 'dark' : 'ghost' },
+        onSetLangNl: () => this.setState({ lang: 'nl' }, () => this.syncUseCaseLang()),
+        onSetLangEn: () => this.setState({ lang: 'en' }, () => this.syncUseCaseLang()),
+        onChangeViewer: () => {},
+        sidebarWidth, collapseIcon, onToggleCollapse, sidebarExpanded, t_repRole: T.repRole,
+        collapseIconRef, powerIconRef, sparklesIconRef, flameIconRef, clockIconRef, arrowRightIconRef, trophyIconRef, arrowLeftIconRef, fileTextIconRef, exitIconRef,
+        isDemoStudioView: false, demoStudioKey: 0, demoStudioFullscreen: false, demoStudioLeftInset: '230px', onExitDemoStudio: () => this.setState({ view: 'home', demoStudioFullscreen: false }), t_exitDemoStudio: T.exitDemoStudio,
+        businessRules, t_rulesTitle, owner, contacts, onOpenHelp, isHelpView,
+        t_closedLostTitle: T.closedLostTitle, closedLostReasons: T.closedLostReasons, t_closedLostNote: T.closedLostNote,
+        t_contactsTitle: T.contactsTitle, t_contactsFooter: T.contactsFooter,
+        isHomeView: true, isToolkitView: false, isStageView: false, isUsecasesView: false, isPlaceholderView: false,
+        showViewerSwitcher: true, useCaseMountRef: this.mountUseCases,
+        stageCards: [], activeStageData: { title: '', blurb: '', items: [] }, toolkitTags: [], placeholderTitle: '',
+        onBackToToolkit: () => this.setState({ view: 'toolkit' }),
+        t_toolkitTitle: T.toolkitTitle, t_toolkitSub: T.toolkitSub, t_searchPlaceholder: T.searchPlaceholder,
+        t_backToToolkit: T.backToToolkit, t_comingSoon: T.comingSoon, t_notBuiltYet: T.notBuiltYet,
+        productsIconRef, onOpenAdmin, productsBg, productsBorder, productsFg, productsJustify, t_navProducts: T.navProducts,
+        isAdminView, quickActions, pipelineHealth, t_pipelineHealthTitle: T.pipelineHealthTitle, t_pipelineHealthNote: T.pipelineHealthNote,
+        t_adminTitle: T.admin.title, t_adminSub: T.admin.sub, t_routingTitle: T.admin.routingTitle, t_routingBadge: T.admin.routingBadge, t_routingCaption: T.admin.routingCaption,
+        routingSteps: T.admin.routingSteps, t_fallbackTitle: T.admin.fallbackTitle, t_fallbackText: T.admin.fallbackText, t_priorityTitle: T.admin.priorityTitle, t_priorityText: T.admin.priorityText,
+        t_ownerTableTitle: T.admin.ownerTableTitle, t_ownerColProduct: T.admin.ownerColProduct, t_ownerColOwner: T.admin.ownerColOwner, t_noOwnerBadge: T.admin.noOwnerBadge, t_ownerComboNote: T.admin.ownerComboNote, ownerRows,
+      };
+    }
+
+    const reps = mod.listReps().slice().sort((a, b) => a.name.localeCompare(b.name));
+    const viewerId = this.state.viewerId || 'ivo';
+    const viewerMeta = reps.find((r) => r.id === viewerId) || reps[0];
+    const snap = mod.getViewerSnapshot(viewerId, this.state.period);
+    const view = this.state.view;
+    const stages = T.stages;
+    const navRowJustify = collapsed ? 'center' : 'flex-start';
+
+    const toggleToolkit = () => this.setState((s) => ({ toolkitExpanded: !s.toolkitExpanded }));
+
+    const rowDefs = [
+      { id: 'home', icon: 'home', label: T.navHome },
+      { id: 'team', icon: 'users', label: T.navTeam },
+      { divider: true },
+      { id: 'toolkit', icon: 'layout-grid', label: T.navToolkit, chevron: true },
+    ];
+    if (this.state.toolkitExpanded && !collapsed) {
+      stages.forEach((s) => rowDefs.push({ id: 'stage:' + s.id, icon: s.icon, label: s.title, sub: true }));
+    }
+    rowDefs.push({ id: 'usecases', icon: 'lightbulb', label: T.navUseCases });
+    rowDefs.push({ id: 'demo', icon: 'monitor-play', label: T.navDemoStudio });
+
+    const navRows = rowDefs.map((r) => {
+      if (r.divider) return { isDivider: true, isItem: false };
+      const isActive = r.id === 'home' ? view === 'home'
+        : r.id === 'team' ? view === 'team'
+        : r.id === 'demo' ? view === 'demo'
+        : r.id === 'usecases' ? view === 'usecases'
+        : r.id === 'toolkit' ? (view === 'toolkit' || view === 'stage')
+        : r.sub ? (view === 'stage' && this.state.activeStage === r.id.slice(6))
+        : false;
+      const onClick = r.id === 'home' ? () => this.setState({ view: 'home' })
+        : r.id === 'team' ? () => this.setState({ view: 'team' })
+        : r.id === 'demo' ? () => { try { localStorage.removeItem('spotler-sales-tool:v1'); } catch (e) {} this.setState({ view: 'demo', demoStudioKey: (this.state.demoStudioKey || 0) + 1, demoStudioFullscreen: false }); }
+        : r.id === 'usecases' ? () => this.setState({ view: 'usecases' })
+        : r.id === 'toolkit' ? () => this.setState({ view: 'toolkit', toolkitExpanded: true })
+        : () => goStage(r.id.slice(6));
+      const iconPx = r.sub ? 15 : 18;
+      const chevronIcon = this.state.toolkitExpanded ? 'chevron-up' : 'chevron-down';
+      return {
+        isDivider: false, isItem: true,
+        icon: r.icon, label: r.label,
+        bg: isActive ? 'var(--cyan)' : 'transparent',
+        fg: isActive ? '#ffffff' : 'rgba(255,255,255,0.75)',
+        fontWeight: isActive ? 800 : 600,
+        fontSize: r.sub ? '12.5px' : '13.5px',
+        iconSize: iconPx + 'px',
+        iconRef: this.getIconRef(r.icon, iconPx),
+        padding: r.sub ? '8px 10px' : '11px 12px',
+        indent: r.sub ? '18px' : '0px',
+        justify: navRowJustify,
+        onClick,
+        hasChevron: !!r.chevron && !collapsed,
+        chevronIcon,
+        chevronIconRef: this.getIconRef(chevronIcon, 14),
+        onChevronClick: toggleToolkit,
+      };
+    });
+
+    const periodDefs = ['week', 'month', 'quarter'];
+    const periodOptions = periodDefs.map((p) => ({
+      label: T['period_' + p],
+      variant: this.state.period === p ? 'dark' : 'ghost',
+      onClick: () => this.setState({ period: p }),
+    }));
+
+    const stageLabelKey = { qualified: 'stageQualified', demo: 'stageDemo', proposal: 'stageProposal', closedwon: 'stageClosedWon' };
+    const funnelTiles = snap.funnel.map((f) => ({
+      label: T[stageLabelKey[f.stage]],
+      youPctLabel: pct(f.you),
+      teamPctLabel: pct(f.team),
+      youBarWidth: pct(Math.min(1, f.you)),
+      teamBarWidth: pct(Math.min(1, f.team)),
+    }));
+
+    const panelMeta = {
+      discovery: { titleKey: 'panelDiscoveryTitle', subKey: 'panelDiscoverySub', actionKey: 'panelDiscoveryAction' },
+      usecase: { titleKey: 'panelUsecaseTitle', subKey: 'panelUsecaseSub', actionKey: 'panelUsecaseAction' },
+      multithread: { titleKey: 'panelMultiTitle', subKey: 'panelMultiSub', actionKey: 'panelMultiAction' },
+      nextstep: { titleKey: 'panelNextstepTitle', subKey: 'panelNextstepSub', actionKey: 'panelNextstepAction' },
+    };
+    const panelOrder = ['discovery', 'usecase', 'multithread', 'nextstep'];
+    const panelsById = {};
+    snap.panels.forEach((p) => { panelsById[p.id] = p; });
+
+    const vsPrevText = this.state.period === 'week' ? T.vsLastWeek : T.vsPrevPeriod;
+    const periodWord = { week: T.periodWordWeek, month: T.periodWordMonth, quarter: T.periodWordQuarter }[this.state.period];
+
+    const panels = panelOrder.map((id) => {
+      const p = panelsById[id];
+      const meta = panelMeta[id];
+      const delta = p.delta;
+      const sign = delta > 0 ? '+' : '';
+      const trendIcon = delta > 0 ? 'trending-up' : delta < 0 ? 'trending-down' : 'minus';
+      const trendIconRef = this.getIconRef(trendIcon, 11);
+      const trendTone = delta > 0 ? 'success' : delta < 0 ? 'warning' : 'neutral';
+      const rawPct = p.target > 0 ? (p.count / p.target) * 100 : 0;
+      const isActive = this.state.activePanelId === id;
+
+      const leaderboard = p.leaderboard.map((row) => ({
+        rank: row.rank,
+        isViewer: row.isViewer,
+        isNamed: row.isNamed,
+        isMasked: !row.isNamed,
+        name: row.name || '',
+        nameWeight: row.isViewer ? 800 : 600,
+        rowBg: row.isViewer ? 'var(--cyan-tint)' : 'transparent',
+        countLabel: lang === 'nl' ? `${row.count} van ${row.denom}` : `${row.count} of ${row.denom}`,
+        maskWidth: `${40 + (row.maskSeed % 55)}px`,
+      }));
+
+      return {
+        id,
+        title: T[meta.titleKey],
+        subLabel: T[meta.subKey],
+        nextAction: T[meta.actionKey],
+        countLabel: lang === 'nl' ? `${p.count} van ${p.denom}` : `${p.count} of ${p.denom}`,
+        teamAvgLabel: lang === 'nl' ? `${p.teamAvgCount} van ${p.teamAvgDenom}` : `${p.teamAvgCount} of ${p.teamAvgDenom}`,
+        trendIcon,
+        trendIconRef,
+        trendTone,
+        trendLabel: `${sign}${delta} ${vsPrevText}`,
+        progressWidth: `${Math.min(100, Math.max(6, rawPct))}%`,
+        targetLabel: targetLabel(lang, p.count, p.target, periodWord),
+        showLeaderboard: isActive,
+        leaderboard,
+        onHoverStart: () => this.setState({ activePanelId: id }),
+        onHoverEnd: () => this.setState({ activePanelId: null }),
+        onToggle: () => this.setState((s) => ({ activePanelId: s.activePanelId === id ? null : id })),
+      };
+    });
+
+    const rawActiveStage = stages.find((s) => s.id === this.state.activeStage) || stages[0];
+    const activeStageData = Object.assign({}, rawActiveStage, {
+      richItems: (rawActiveStage.richItems || []).map((rich) => {
+        if (rich.isProtocols) {
+          return Object.assign({}, rich, {
+            sources: rich.sources.map((src) => {
+              const isOpen = this.state.expandedProtocolId === src.id;
+              return Object.assign({}, src, {
+                isOpen,
+                onToggle: () => this.setState((s) => ({ expandedProtocolId: s.expandedProtocolId === src.id ? null : src.id })),
+                iconRef: this.getIconRef(src.icon, 16),
+                chevronRef: this.getIconRef(isOpen ? 'chevron-up' : 'chevron-down', 13),
+              });
+            }),
+          });
+        }
+        if (rich.isLinks) {
+          return Object.assign({}, rich, {
+            links: rich.links.map((lk) => Object.assign({}, lk, {
+              iconRef: this.getIconRef(lk.icon, 17),
+              arrowRef: this.getIconRef('arrow-right', 12),
+              onClick: lk.id === 'demoStudio'
+                ? () => { try { localStorage.removeItem('spotler-sales-tool:v1'); } catch (e) {} this.setState({ view: 'demo', demoStudioKey: (this.state.demoStudioKey || 0) + 1, demoStudioFullscreen: false }); }
+                : () => this.setState({ view: 'usecases' }),
+            })),
+          });
+        }
+        return rich;
+      }),
+    });
+
+    return {
+      navRows,
+      sidebarWidth, collapseIcon, onToggleCollapse, sidebarExpanded,
+      collapseIconRef, powerIconRef, sparklesIconRef, flameIconRef, clockIconRef, arrowRightIconRef, trophyIconRef, arrowLeftIconRef, fileTextIconRef, exitIconRef,
+      isDemoStudioView: view === 'demo', demoStudioKey: this.state.demoStudioKey || 0,
+      demoStudioFullscreen: this.state.demoStudioFullscreen,
+      demoStudioLeftInset: this.state.demoStudioFullscreen ? '0' : sidebarWidth,
+      onExitDemoStudio: () => this.setState({ view: 'home', demoStudioFullscreen: false }), t_exitDemoStudio: T.exitDemoStudio,
+      repSelectOptions: reps.map((r) => ({ value: r.id, label: r.name })),
+      viewingAsLabel: T.viewingAs,
+      viewerId,
+      onChangeViewer: (e) => this.setState({ viewerId: e.target.value, activePanelId: null }),
+      langVariant: { nl: lang === 'nl' ? 'dark' : 'ghost', en: lang === 'en' ? 'dark' : 'ghost' },
+      onSetLangNl: () => this.setState({ lang: 'nl' }, () => this.syncUseCaseLang()),
+      onSetLangEn: () => this.setState({ lang: 'en' }, () => this.syncUseCaseLang()),
+      viewerInitials: initials(viewerMeta.name),
+      viewerName: viewerMeta.name,
+      t_repRole: T.repRole,
+      greeting: `${T.hi} ${viewerMeta.name}`,
+      programDayLabel: T.programDay(snap.programDay.week, snap.programDay.day, snap.programDay.cycleLen),
+      pointsValue: String(snap.points),
+      t_points: T.points,
+      streakLabel: T.streakLabel(snap.streakWeeks),
+      dataAsOfLabel: `${T.dataAsOf} ${formatDate(snap.dataAsOf, lang)}`,
+      periodOptions,
+      t_funnelTitle: T.funnelTitle,
+      t_you: T.you,
+      t_team: T.team,
+      funnelTiles,
+      t_panelsTitle: T.panelsTitle,
+      t_hoverHint: T.hoverHint,
+      t_teamAvg: T.teamAvg,
+      t_leaderboardTitle: T.leaderboardTitle,
+      t_leaderboardFooter: T.leaderboardFooter,
+      t_help: T.navHelp,
+      panels,
+      businessRules, t_rulesTitle, owner, contacts, onOpenHelp, isHelpView,
+      t_closedLostTitle: T.closedLostTitle, closedLostReasons: T.closedLostReasons, t_closedLostNote: T.closedLostNote,
+      t_contactsTitle: T.contactsTitle, t_contactsFooter: T.contactsFooter,
+      t_tableProduct: T.tableProduct, t_tableDesc: T.tableDesc, t_tableNb: T.tableNb, t_tableEb: T.tableEb, t_tableType: T.tableType,
+      isHomeView: view === 'home',
+      isToolkitView: view === 'toolkit',
+      isStageView: view === 'stage',
+      isUsecasesView: view === 'usecases',
+      isPlaceholderView: view === 'team',
+      showViewerSwitcher: view !== 'usecases' && view !== 'admin', useCaseMountRef: this.mountUseCases,
+      placeholderTitle: T.navTeam,
+      stageCards: stages.map((s) => ({ icon: s.icon, iconRef: this.getIconRef(s.icon, 19), title: s.title, blurb: s.blurb, onClick: () => goStage(s.id) })),
+      activeStageData,
+      toolkitTags: stages.map((s) => s.title),
+      onBackToToolkit: () => this.setState({ view: 'toolkit' }),
+      t_toolkitTitle: T.toolkitTitle,
+      t_toolkitSub: T.toolkitSub,
+      t_searchPlaceholder: T.searchPlaceholder,
+      t_backToToolkit: T.backToToolkit,
+      t_comingSoon: T.comingSoon,
+      t_notBuiltYet: T.notBuiltYet,
+      productsIconRef, onOpenAdmin, productsBg, productsBorder, productsFg, productsJustify, t_navProducts: T.navProducts,
+      isAdminView, quickActions, pipelineHealth, t_pipelineHealthTitle: T.pipelineHealthTitle, t_pipelineHealthNote: T.pipelineHealthNote,
+      t_adminTitle: T.admin.title, t_adminSub: T.admin.sub, t_routingTitle: T.admin.routingTitle, t_routingBadge: T.admin.routingBadge, t_routingCaption: T.admin.routingCaption,
+      routingSteps: T.admin.routingSteps, t_fallbackTitle: T.admin.fallbackTitle, t_fallbackText: T.admin.fallbackText, t_priorityTitle: T.admin.priorityTitle, t_priorityText: T.admin.priorityText,
+      t_ownerTableTitle: T.admin.ownerTableTitle, t_ownerColProduct: T.admin.ownerColProduct, t_ownerColOwner: T.admin.ownerColOwner, t_noOwnerBadge: T.admin.noOwnerBadge, t_ownerComboNote: T.admin.ownerComboNote, ownerRows,
+    };
+  }
+}
+
+</script>
+</body>
+</html>

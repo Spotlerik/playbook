@@ -1,0 +1,29 @@
+/* ================================================================
+   Spotler Design System — typography tokens
+   Header: Greycliff CF Heavy → Open Sans 800 (digital fallback).
+   Body: Open Sans (web / presentations / email).
+   ================================================================ */
+:root {
+  /* ---------- Font families ---------- */
+  --font-display: 'Greycliff CF', 'Open Sans', system-ui, -apple-system, sans-serif;
+  --font-body:    'Greycliff CF', 'Open Sans', system-ui, -apple-system, sans-serif;
+  --font-mono:    ui-monospace, 'SF Mono', 'Menlo', 'Consolas', monospace;
+
+  /* ---------- Type scale ----------
+     Headers use --font-display (Greycliff CF Heavy, 800).
+     Body uses --font-body at 400 / 600. Letterspacing tight on
+     display, normal on body. Sizes in px. */
+  --fs-display: 72px;  --lh-display: 1.04; /* @kind other */
+  --fs-h1:      56px;  --lh-h1:      1.08; /* @kind other */
+  --fs-h2:      40px;  --lh-h2:      1.12; /* @kind other */
+  --fs-h3:      28px;  --lh-h3:      1.20; /* @kind other */
+  --fs-h4:      22px;  --lh-h4:      1.28; /* @kind other */
+  --fs-body-lg: 18px;  --lh-body-lg: 1.55; /* @kind other */
+  --fs-body:    16px;  --lh-body:    1.55; /* @kind other */
+  --fs-body-sm: 14px;  --lh-body-sm: 1.50; /* @kind other */
+  --fs-caption: 12px;  --lh-caption: 1.40; /* @kind other */
+
+  --tracking-display: -0.025em; /* @kind other */
+  --tracking-tight:   -0.02em; /* @kind other */
+  --tracking-caption:  0.08em; /* @kind other */
+}

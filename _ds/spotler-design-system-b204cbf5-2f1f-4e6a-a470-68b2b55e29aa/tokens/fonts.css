@@ -1,0 +1,15 @@
+/* ================================================================
+   Spotler Design System — fonts
+   Header: Greycliff CF Heavy (commercial — Connary Fagen)
+   Body (print): Greycliff CF Regular
+   Fallback (web / digital): Open Sans — official brand fallback.
+
+   NOTE (standalone build): the design project ships Open Sans as local
+   variable-font .ttf files under ../fonts/. Those binaries exceed the
+   import size limit and are not vendored here, so this file loads the
+   same Open Sans family from Google Fonts instead — exactly as the
+   sibling use-case explorer (usecases/index.html) already does. The
+   --font-display / --font-body tokens still prefer 'Greycliff CF' first
+   and fall back to Open Sans, then system-ui.
+   ================================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');

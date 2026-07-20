@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Use Case Menu · Spotler Activate</title>
+<meta name="description" content="Interactive use case explorer for Spotler Activate — filter by challenge, industry, type and setup, and build a pitch shortlist.">
+<link rel="icon" href="assets/spotler-logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; }
+  body { font-family: 'Open Sans', system-ui, -apple-system, Segoe UI, Roboto, sans-serif; color: #1f2d3a; background: #eef2f6; -webkit-font-smoothing: antialiased; }
+  *, *::before, *::after { box-sizing: border-box; }
+  button { font-family: inherit; }
+  ::selection { background: #cfeefb; }
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: #ccdde3; border-radius: 8px; }
+  ::-webkit-scrollbar-thumb:hover { background: #a9bcc6; }
+  /* Drawer / card animation */
+  @keyframes ucm-fade { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes ucm-slidein { from { transform: translateX(24px); opacity: 0 } to { transform: translateX(0); opacity: 1 } }
+  @keyframes ucm-pop { 0% { transform: scale(.9); opacity: 0 } 100% { transform: scale(1); opacity: 1 } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<!-- React 18.3.1 UMD from CDN (same version support.js loads for the Coaching Hub).
+     The design project vendored these under vendor/; the CDN is used here so the
+     standalone page needs no large binaries checked into the repo. -->
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+<script src="uc-mockups.js"></script>
+<script src="strings_nl.js"></script>
+<script src="use_cases.js"></script>
+<script src="app.js"></script>
+<script>
+  // app.js only defines window.UseCaseApp; mount it here for the standalone page.
+  // (Inside the Coaching Hub the shell mounts it via its own React root.)
+  window.ReactDOM.createRoot(document.getElementById('root'))
+    .render(window.React.createElement(window.UseCaseApp));
+</script>
+</body>
+</html>

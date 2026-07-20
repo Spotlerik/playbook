@@ -1,0 +1,84 @@
+/* ================================================================
+   Spotler Design System — colour tokens
+   Source: Brand-Colours.pdf, Brand-Cloud-Colours.pdf (Oct–Dec 2025).
+   Two blues lead everything (Navy + Cyan). Yellow is the Spotlight,
+   nothing else, in its pure tone. Cloud accents stay supporting.
+   ================================================================ */
+:root {
+  /* ---------- Primary: Knowledge Blue (Navy) — the steady foundation ---------- */
+  --navy:          #002a4d;
+  --navy-tint:     #ccdde3;
+  --navy-shade:    #001d34;
+
+  /* ---------- Primary: Honesty Blue (Cyan) — the signature accent ---------- */
+  --cyan:          #23afe6;
+  --cyan-tint:     #e6f6fc;
+  --cyan-tone:     #8ec8ed;
+  --cyan-shade:    #1d93c1;
+
+  /* ---------- Spirit Yellow — reserved for the Spotlight (pure tone only) ---------- */
+  --yellow:        #f0e306;
+  --yellow-tint:   #fdfbdb;
+  --yellow-tone:   #f6ef71;
+  --yellow-shade:  #cabf05;
+
+  /* ---------- Success Green — Service Cloud ---------- */
+  --green:         #5cd975;
+  --green-tint:    #dff4e3;
+  --green-tone:    #a2e9b0;
+  --green-shade:   #429b54;
+
+  /* ---------- Legend Orange — Marketing Cloud for B2B ---------- */
+  --orange:        #fb7c1c;
+  --orange-tint:   #fee2cc;
+  --orange-tone:   #fdb47d;
+  --orange-shade:  #bc5d15;
+
+  /* ---------- Uplifting Purple — Marketing Cloud for Commerce ---------- */
+  --purple:        #942fea;
+  --purple-tint:   #ead5fb;
+  --purple-tone:   #c288f3;
+  --purple-shade:  #6f23b0;
+
+  /* ---------- Neutrals (derived) ---------- */
+  --white:         #ffffff;
+  --off-white:     #f7f9fb;
+  --grey-50:       #eef2f5;
+  --grey-100:      #dde4ea;
+  --grey-200:      #c1ccd4;
+  --grey-300:      #93a2ad;
+  --grey-400:      #667682;
+  --grey-500:      #3f4b55;
+  --grey-600:      #1f2830;
+  --black:         #0a0e12;
+
+  /* ---------- Semantic aliases ---------- */
+  --bg:            var(--white);
+  --bg-alt:        var(--off-white);
+  --bg-inverse:    var(--navy);
+  --bg-highlight:  var(--cyan-tint);
+
+  --fg1:           var(--navy);      /* primary text */
+  --fg2:           var(--grey-500);  /* secondary text */
+  --fg3:           var(--grey-400);  /* tertiary / meta */
+  --fg-inverse:    var(--white);
+  --fg-link:       var(--cyan-shade);
+
+  --border:        var(--grey-100);
+  --border-strong: var(--grey-200);
+  --border-focus:  var(--cyan);
+
+  --success:       var(--green-shade);
+  --warning:       var(--orange-shade);
+  --info:          var(--cyan-shade);
+  --danger:        #d64545; /* derived — not in the brand palette */
+}
+
+/* ================================================================
+   Cloud theming — apply [data-cloud] to any container to scope the
+   supporting accent, then use --cloud / --cloud-tint / --cloud-shade.
+   ================================================================ */
+[data-cloud="b2b"]      { --cloud: var(--orange); --cloud-tint: var(--orange-tint); --cloud-shade: var(--orange-shade); }
+[data-cloud="commerce"] { --cloud: var(--purple); --cloud-tint: var(--purple-tint); --cloud-shade: var(--purple-shade); }
+[data-cloud="service"]  { --cloud: var(--green);  --cloud-tint: var(--green-tint);  --cloud-shade: var(--green-shade);  }
+[data-cloud="ai"]       { --cloud: var(--cyan);   --cloud-tint: var(--cyan-tint);   --cloud-shade: var(--cyan-shade);   }
