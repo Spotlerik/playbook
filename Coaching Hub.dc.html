@@ -453,7 +453,13 @@
       <sc-if value="{{ isTeamView }}" hint-placeholder-val="{{ false }}">
         <div style="padding:var(--space-6) 0 0; display:flex; flex-direction:column; gap:var(--space-7);">
           <div>
-            <div style="font-family:var(--font-display); font-weight:800; font-size:var(--fs-h2); color:var(--navy);">{{ teamTitle }}</div>
+            <div style="display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:var(--space-3);">
+              <div style="font-family:var(--font-display); font-weight:800; font-size:var(--fs-h2); color:var(--navy);">{{ teamTitle }}</div>
+              <div style="display:flex; align-items:center; gap:6px; font-size:12px; color:var(--fg3);">
+                <span ref="{{ clockIconRef }}" style="display:inline-flex; width:13px; height:13px; flex-shrink:0;"></span>
+                <span>{{ dataAsOfLabel }}</span>
+              </div>
+            </div>
             <div style="font-size:14px; color:var(--fg3); margin-top:6px; max-width:640px;">{{ teamSubtitle }}</div>
           </div>
 
@@ -489,18 +495,49 @@
 
           <div>
             <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:var(--space-3); flex-wrap:wrap; gap:var(--space-2);">
+              <div style="font-size:12px; font-weight:700; letter-spacing:var(--tracking-caption); text-transform:uppercase; color:var(--fg3);">{{ teamFunnelTitle }}</div>
+              <div style="font-size:11px; color:var(--fg3);">{{ teamFunnelNote }}</div>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:var(--space-4);">
+              <sc-for list="{{ teamFunnelTiles }}" as="tile" hint-placeholder-count="4">
+                <x-import component-from-global-scope="SpotlerDesignSystem_b204cb.Card" elevation="sm" radius="lg" padding="{{ 20 }}" hint-size="100%,120px">
+                  <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px;">
+                    <span style="font-size:12.5px; font-weight:700; color:var(--fg2);">{{ tile.label }}</span>
+                    <div style="display:flex; align-items:center; gap:4px; font-size:10.5px; font-weight:700; color:var(--fg3); white-space:nowrap;">
+                      <span ref="{{ tile.trendIconRef }}" style="display:inline-flex; width:12px; height:12px; flex-shrink:0;"></span>{{ tile.trendLabel }}
+                    </div>
+                  </div>
+                  <div style="display:flex; align-items:baseline; gap:7px;">
+                    <span style="font-family:var(--font-display); font-weight:800; font-size:27px; color:var(--navy); letter-spacing:var(--tracking-tight);">{{ tile.teamPctLabel }}</span>
+                    <span style="font-size:12px; color:var(--fg3);">{{ t_team }}</span>
+                  </div>
+                  <div style="height:5px; background:var(--grey-100); border-radius:var(--radius-pill); position:relative; overflow:hidden; margin-top:10px;">
+                    <div style="position:absolute; inset:0; border-radius:var(--radius-pill); background:var(--cyan); width:{{ tile.teamBarWidth }};"></div>
+                  </div>
+                </x-import>
+              </sc-for>
+            </div>
+          </div>
+
+          <div>
+            <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:var(--space-3); flex-wrap:wrap; gap:var(--space-2);">
               <div style="font-size:12px; font-weight:700; letter-spacing:var(--tracking-caption); text-transform:uppercase; color:var(--fg3);">{{ teamBoardsTitle }}</div>
               <div style="font-size:11px; color:var(--fg3);">{{ teamBoardsNote }}</div>
             </div>
             <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:var(--space-4);">
               <sc-for list="{{ teamBoards }}" as="board" hint-placeholder-count="4">
                 <div style="background:#fff; border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); display:flex; flex-direction:column; overflow:hidden;">
-                  <div style="padding:14px var(--space-4) 10px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:10px;">
+                  <div style="padding:14px var(--space-4) 10px; display:flex; align-items:center; justify-content:space-between; gap:10px;">
                     <div style="min-width:0;">
                       <div style="font-family:var(--font-display); font-weight:800; font-size:14.5px; color:var(--navy);">{{ board.title }}</div>
                       <div style="font-size:11.5px; color:var(--fg3); margin-top:2px;">{{ board.subLabel }}</div>
                     </div>
                     <span ref="{{ trophyIconRef }}" style="display:inline-flex; width:15px; height:15px; color:var(--cyan-shade); flex-shrink:0;"></span>
+                  </div>
+                  <div style="padding:0 var(--space-4) 12px; display:flex; align-items:center; gap:9px; border-bottom:1px solid var(--border);">
+                    <span style="font-family:var(--font-display); font-weight:800; font-size:20px; color:var(--navy); letter-spacing:var(--tracking-tight);">{{ board.teamCountLabel }}</span>
+                    <span style="font-size:10.5px; color:var(--fg3);">{{ t_teamAvg }}</span>
+                    <x-import component-from-global-scope="SpotlerDesignSystem_b204cb.Badge" tone="{{ board.teamTrendTone }}" hint-size="90px,20px"><span ref="{{ board.teamTrendIconRef }}" style="display:inline-flex; width:11px; height:11px; flex-shrink:0;"></span>{{ board.teamTrendLabel }}</x-import>
                   </div>
                   <div style="padding:6px var(--space-3);">
                     <sc-for list="{{ board.leaderboard }}" as="row" hint-placeholder-count="14">
@@ -534,9 +571,9 @@
             </div>
             <div style="display:flex; gap:8px; flex-wrap:wrap; flex:1;">
               <sc-for list="{{ teamPosition }}" as="pos" hint-placeholder-count="4">
-                <div style="display:flex; align-items:center; gap:7px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.16); border-radius:var(--radius-pill); padding:5px 12px;">
-                  <span style="font-size:11px; color:rgba(255,255,255,0.7);">{{ pos.signal }}</span>
-                  <span style="font-size:12px; font-weight:800; color:var(--cyan);">{{ pos.rankLabel }}</span>
+                <div style="display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.16); border-radius:var(--radius-pill); padding:5px 13px;">
+                  <span style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.85);">{{ pos.signal }}</span>
+                  <span style="font-size:11.5px; color:var(--cyan);">{{ pos.metric }}</span>
                 </div>
               </sc-for>
             </div>
@@ -749,10 +786,17 @@ const I18N = {
       { icon: 'alert-triangle', label: 'Stuck deals >60d', value: '84', sub: "€1,03M vervuilde forecast", tone: 'danger', trendIcon: 'trending-up', trendLabel: '+11 t.o.v. vorige week', prompt: 'Welke deals precies? Deze week opschonen of heractiveren.' },
       { icon: 'euro', label: 'MRR ontbreekt', value: '45%', sub: 'Deals zonder productline item', tone: 'info', trendIcon: 'minus', trendLabel: 'gelijk t.o.v. vorige week', prompt: 'Vul het product aan bij het aanmaken — zonder productline item geen dealwaarde.' },
     ],
+    teamTitle: 'Team — Commercial NL',
     teamSubtitle: 'De gedeelde stand van zaken — de basis voor de wekelijkse teammeeting.',
     teamHealthTitle: 'Pipeline-gezondheid — teammeeting',
     teamHealthNote: 'Vaste analyse, Commercial Team NL. Elke tegel is een gespreksstarter: eerst de stand, dan het waarom.',
     teamDiscussLabel: 'Bespreken',
+    teamFunnelTitle: 'Teamfunnel',
+    teamFunnelNote: 'Teamtotalen versus vorige periode — de funnel rangschikt nooit individuen.',
+    // FRAMING PENDING RUSS (celebration vs "create guilt"): the copy below is deliberately easy to
+    // adjust. The mechanics (named top + redacted-until-you-climb board, per functional-scope §1.1)
+    // are final; only the surrounding tone/emphasis waits on Russ's culture call.
+    // See docs/playbook-team-page-brief.md, Block 3.
     teamBoardsTitle: 'Ranglijsten per signaal',
     teamBoardsNote: 'Wie converteert, wie lekt — per coachingsignaal.',
     teamPositionTitle: 'Jouw positie',
@@ -964,10 +1008,14 @@ const I18N = {
       { icon: 'alert-triangle', label: 'Stuck deals >60d', value: '84', sub: '€1.03M polluted forecast', tone: 'danger', trendIcon: 'trending-up', trendLabel: '+11 vs last week', prompt: 'Which deals exactly? Clean them up or re-activate them this week.' },
       { icon: 'euro', label: 'MRR missing', value: '45%', sub: 'Deals missing a product line item', tone: 'info', trendIcon: 'minus', trendLabel: 'flat vs last week', prompt: 'Fill in the product on creation — no line item means no deal value.' },
     ],
+    teamTitle: 'Team — Commercial NL',
     teamSubtitle: 'The shared state of play — the base for the weekly team meeting.',
     teamHealthTitle: 'Pipeline health — team meeting',
     teamHealthNote: 'Fixed analysis, Commercial Team NL. Each tile is a discussion starter: the state first, then the why.',
     teamDiscussLabel: 'Discuss',
+    teamFunnelTitle: 'Team funnel',
+    teamFunnelNote: 'Team totals versus the previous period — the funnel never ranks individuals.',
+    // FRAMING PENDING RUSS (celebration vs "create guilt") — see the NL note above and the brief.
     teamBoardsTitle: 'Leaderboards by signal',
     teamBoardsNote: 'Who is converting, who is leaking — per coaching signal.',
     teamPositionTitle: 'Your position',
@@ -1257,7 +1305,7 @@ class Component extends DCLogic {
         t_closedLostTitle: T.closedLostTitle, closedLostReasons: T.closedLostReasons, t_closedLostNote: T.closedLostNote,
         t_contactsTitle: T.contactsTitle, t_contactsFooter: T.contactsFooter,
         isHomeView: true, isToolkitView: false, isStageView: false, isUsecasesView: false, isTeamView: false,
-        teamTitle: T.navTeam, teamSubtitle: T.teamSubtitle, teamHealthTitle: T.teamHealthTitle, teamHealthNote: T.teamHealthNote, teamDiscussLabel: T.teamDiscussLabel, teamBoardsTitle: T.teamBoardsTitle, teamBoardsNote: T.teamBoardsNote, teamPositionTitle: T.teamPositionTitle, teamPositionNote: T.teamPositionNote, teamHealthTiles: pipelineHealth, teamBoards: [], teamPosition: [],
+        teamTitle: T.teamTitle, teamSubtitle: T.teamSubtitle, teamHealthTitle: T.teamHealthTitle, teamHealthNote: T.teamHealthNote, teamDiscussLabel: T.teamDiscussLabel, teamFunnelTitle: T.teamFunnelTitle, teamFunnelNote: T.teamFunnelNote, teamBoardsTitle: T.teamBoardsTitle, teamBoardsNote: T.teamBoardsNote, teamPositionTitle: T.teamPositionTitle, teamPositionNote: T.teamPositionNote, teamHealthTiles: pipelineHealth, teamFunnelTiles: [], teamBoards: [], teamPosition: [],
         showViewerSwitcher: true, useCaseMountRef: this.mountUseCases,
         stageCards: [], activeStageData: { title: '', blurb: '', items: [] }, toolkitTags: [],
         onBackToToolkit: () => this.setState({ view: 'toolkit' }),
@@ -1403,13 +1451,49 @@ class Component extends DCLogic {
       };
     });
 
-    // Team page (b + c): reuse the panel leaderboards full-strength, and locate the viewer.
-    const teamBoards = panels.map((p) => ({ title: p.title, subLabel: p.subLabel, leaderboard: p.leaderboard }));
-    const teamPosition = panels.map((p) => {
-      const me = p.leaderboard.find((r) => r.isViewer);
-      const n = p.leaderboard.length;
+    // ── Team page data ──────────────────────────────────────────────────────
+    // Block 2 — team-aggregate funnel: team totals + vs-previous trend. NEVER ranks
+    // individuals (lead-mix luck affects funnel outcomes, not just behaviour).
+    const teamFunnelTiles = snap.funnel.map((f) => {
+      const deltaPts = Math.round((f.team - f.prevTeam) * 100);
+      const dir = deltaPts > 0 ? 'trending-up' : deltaPts < 0 ? 'trending-down' : 'minus';
+      return {
+        label: T[stageLabelKey[f.stage]],
+        teamPctLabel: pct(f.team),
+        teamBarWidth: pct(Math.min(1, f.team)),
+        trendIconRef: this.getIconRef(dir, 12),
+        trendLabel: `${deltaPts > 0 ? '+' : ''}${deltaPts}pt ${vsPrevText}`,
+      };
+    });
+    // Block 3 — coaching signals at team level, each merged with its redacted leaderboard
+    // (named top half + hidden-until-you-climb, per functional-scope §1.1). Reuses the
+    // already-mapped per-viewer leaderboard rows from `panels` (privacy handled server-side).
+    const teamBoards = panels.map((panel, i) => {
+      const p = panelsById[panelOrder[i]];
+      const td = p.teamAvgCount - p.teamAvgPrevCount;
+      const tdir = td > 0 ? 'trending-up' : td < 0 ? 'trending-down' : 'minus';
+      return {
+        title: panel.title,
+        subLabel: panel.subLabel,
+        teamCountLabel: lang === 'nl' ? `${p.teamAvgCount} van ${p.teamAvgDenom}` : `${p.teamAvgCount} of ${p.teamAvgDenom}`,
+        teamTrendTone: td > 0 ? 'success' : td < 0 ? 'warning' : 'neutral',
+        teamTrendIconRef: this.getIconRef(tdir, 11),
+        teamTrendLabel: `${td > 0 ? '+' : ''}${td} ${vsPrevText}`,
+        leaderboard: panel.leaderboard,
+      };
+    });
+    // Block 4 — thin personal-position strip: jij X · teamgemiddelde Y · #rank. Orientation only.
+    const teamPosition = panels.map((panel, i) => {
+      const p = panelsById[panelOrder[i]];
+      const me = panel.leaderboard.find((r) => r.isViewer);
+      const n = panel.leaderboard.length;
       const rank = me ? me.rank : n;
-      return { signal: p.title, rankLabel: lang === 'nl' ? `#${rank} van ${n}` : `#${rank} of ${n}` };
+      return {
+        signal: panel.title,
+        metric: lang === 'nl'
+          ? `jij ${p.count} · teamgemiddelde ${p.teamAvgCount} · #${rank} van ${n}`
+          : `you ${p.count} · team avg ${p.teamAvgCount} · #${rank} of ${n}`,
+      };
     });
 
     const rawActiveStage = stages.find((s) => s.id === this.state.activeStage) || stages[0];
@@ -1489,7 +1573,7 @@ class Component extends DCLogic {
       isUsecasesView: view === 'usecases',
       isTeamView: view === 'team',
       showViewerSwitcher: view !== 'usecases' && view !== 'admin', useCaseMountRef: this.mountUseCases,
-      teamTitle: T.navTeam, teamSubtitle: T.teamSubtitle, teamHealthTitle: T.teamHealthTitle, teamHealthNote: T.teamHealthNote, teamDiscussLabel: T.teamDiscussLabel, teamBoardsTitle: T.teamBoardsTitle, teamBoardsNote: T.teamBoardsNote, teamPositionTitle: T.teamPositionTitle, teamPositionNote: T.teamPositionNote, teamHealthTiles: pipelineHealth, teamBoards, teamPosition,
+      teamTitle: T.teamTitle, teamSubtitle: T.teamSubtitle, teamHealthTitle: T.teamHealthTitle, teamHealthNote: T.teamHealthNote, teamDiscussLabel: T.teamDiscussLabel, teamFunnelTitle: T.teamFunnelTitle, teamFunnelNote: T.teamFunnelNote, teamBoardsTitle: T.teamBoardsTitle, teamBoardsNote: T.teamBoardsNote, teamPositionTitle: T.teamPositionTitle, teamPositionNote: T.teamPositionNote, teamHealthTiles: pipelineHealth, teamFunnelTiles, teamBoards, teamPosition,
       stageCards: stages.map((s) => ({ icon: s.icon, iconRef: this.getIconRef(s.icon, 19), title: s.title, blurb: s.blurb, onClick: () => goStage(s.id) })),
       activeStageData,
       toolkitTags: stages.map((s) => s.title),

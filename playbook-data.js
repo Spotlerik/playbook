@@ -291,12 +291,14 @@ export function getViewerSnapshot(repId, period) {
     stage,
     you: avgFunnel(safeRepId, stage, range),
     team: teamAverageFunnel(stage, range),
+    prevTeam: teamAverageFunnel(stage, prevRange), // team page: team-aggregate vs-previous trend
   }));
 
   const panels = PANEL_DEFS.map((p) => {
     const cur = sumPanel(safeRepId, p.id, range);
     const prevSum = sumPanel(safeRepId, p.id, prevRange);
     const team = teamAveragePanel(p.id, range);
+    const teamPrev = teamAveragePanel(p.id, prevRange);
     const weeklyTarget = weeklyTargetAt(safeRepId, p.id, CURRENT);
     return {
       id: p.id,
@@ -306,6 +308,7 @@ export function getViewerSnapshot(repId, period) {
       target: Math.max(1, Math.round(weeklyTarget * wInPeriod)),
       teamAvgCount: Math.round(team.count),
       teamAvgDenom: Math.round(team.denom),
+      teamAvgPrevCount: Math.round(teamPrev.count), // team page: team signal vs-previous trend
       leaderboard: visibleLeaderboard(p.id, period, safeRepId),
     };
   });
