@@ -85,6 +85,21 @@
       </div>
     </div>
 
+    <sc-if value="{{ sidebarExpanded }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:0 var(--space-3) var(--space-3); display:flex; flex-direction:column; gap:9px; border-top:1px solid rgba(255,255,255,0.14); padding-top:var(--space-3);">
+        <sc-if value="{{ showViewerSwitcher }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <span style="font-size:10px; font-weight:700; letter-spacing:0.07em; text-transform:uppercase; color:rgba(255,255,255,0.5);">{{ viewingAsLabel }}</span>
+            <x-import component-from-global-scope="SpotlerDesignSystem_b204cb.Select" options="{{ repSelectOptions }}" value="{{ viewerId }}" onChange="{{ onChangeViewer }}" style="width:100%;" hint-size="200px,46px"></x-import>
+          </div>
+        </sc-if>
+        <div style="display:flex; gap:6px;">
+          <button onClick="{{ onSetLangNl }}" style="flex:1; padding:7px 0; border-radius:var(--radius-pill); border:1px solid {{ langSidebar.nlBorder }}; background:{{ langSidebar.nlBg }}; color:{{ langSidebar.nlFg }}; font-family:var(--font-body); font-size:12px; font-weight:700; cursor:pointer; transition:background var(--dur) var(--ease-out), color var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out);">NL</button>
+          <button onClick="{{ onSetLangEn }}" style="flex:1; padding:7px 0; border-radius:var(--radius-pill); border:1px solid {{ langSidebar.enBorder }}; background:{{ langSidebar.enBg }}; color:{{ langSidebar.enFg }}; font-family:var(--font-body); font-size:12px; font-weight:700; cursor:pointer; transition:background var(--dur) var(--ease-out), color var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out);">EN</button>
+        </div>
+      </div>
+    </sc-if>
+
     <div style="margin-top:auto; border-top:1px solid rgba(255,255,255,0.14); padding:var(--space-3); display:flex; align-items:center; gap:10px; min-width:0;">
       <div style="width:30px; height:30px; border-radius:50%; background:var(--cyan); color:var(--navy); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; font-family:var(--font-display); flex-shrink:0;">{{ viewerInitials }}</div>
       <sc-if value="{{ sidebarExpanded }}" hint-placeholder-val="{{ true }}">
@@ -99,16 +114,6 @@
 
   <div style="flex:1; min-width:0; display:flex; justify-content:center;">
     <div style="width:100%; max-width:1360px; padding:0 var(--space-7) var(--space-8); box-sizing:border-box;">
-
-      <div style="display:flex; justify-content:flex-end; align-items:flex-end; gap:var(--space-3); padding:var(--space-4) 0 0;">
-        <sc-if value="{{ showViewerSwitcher }}" hint-placeholder-val="{{ true }}">
-          <x-import component-from-global-scope="SpotlerDesignSystem_b204cb.Select" label="{{ viewingAsLabel }}" options="{{ repSelectOptions }}" value="{{ viewerId }}" onChange="{{ onChangeViewer }}" style="width:190px;" hint-size="190px,62px"></x-import>
-        </sc-if>
-        <div style="display:flex; gap:6px; padding-bottom:1px;">
-          <x-import component-from-global-scope="SpotlerDesignSystem_b204cb.Button" variant="{{ langVariant.nl }}" size="sm" onClick="{{ onSetLangNl }}" hint-size="50px,34px">NL</x-import>
-          <x-import component-from-global-scope="SpotlerDesignSystem_b204cb.Button" variant="{{ langVariant.en }}" size="sm" onClick="{{ onSetLangEn }}" hint-size="50px,34px">EN</x-import>
-        </div>
-      </div>
 
       <sc-if value="{{ isHomeView }}" hint-placeholder-val="{{ true }}">
         <div>
@@ -1281,6 +1286,17 @@ class Component extends DCLogic {
     const fileTextIconRef = this.getIconRef('file-text', 16);
     const exitIconRef = this.getIconRef('x', 13);
     const infoIconRef = this.getIconRef('info', 12);
+    const chevronDownIconRef = this.getIconRef('chevron-down', 14);
+    // Dark-rail styling for the "Bekijken als" / NL-EN controls now living in the
+    // sidebar: active language = Spotler cyan on navy text; inactive = translucent.
+    const langSidebar = {
+      nlBg: this.state.lang === 'nl' ? 'var(--cyan)' : 'transparent',
+      nlFg: this.state.lang === 'nl' ? 'var(--navy)' : 'rgba(255,255,255,0.82)',
+      nlBorder: this.state.lang === 'nl' ? 'var(--cyan)' : 'rgba(255,255,255,0.24)',
+      enBg: this.state.lang === 'en' ? 'var(--cyan)' : 'transparent',
+      enFg: this.state.lang === 'en' ? 'var(--navy)' : 'rgba(255,255,255,0.82)',
+      enBorder: this.state.lang === 'en' ? 'var(--cyan)' : 'rgba(255,255,255,0.24)',
+    };
     const productsActive = this.state.view === 'admin';
     const productsJustify = collapsed ? 'center' : 'flex-start';
     const productsIconRef = this.getIconRef('package', 14);
@@ -1307,6 +1323,7 @@ class Component extends DCLogic {
         t_leaderboardTitle: T.leaderboardTitle, t_leaderboardFooter: T.leaderboardFooter, t_help: T.navHelp,
         viewingAsLabel: T.viewingAs, viewerId: this.state.viewerId,
         langVariant: { nl: this.state.lang === 'nl' ? 'dark' : 'ghost', en: this.state.lang === 'en' ? 'dark' : 'ghost' },
+        langSidebar, chevronDownIconRef,
         onSetLangNl: () => this.setState({ lang: 'nl' }, () => this.syncUseCaseLang()),
         onSetLangEn: () => this.setState({ lang: 'en' }, () => this.syncUseCaseLang()),
         onChangeViewer: () => {},
@@ -1552,6 +1569,7 @@ class Component extends DCLogic {
       viewerId,
       onChangeViewer: (e) => this.setState({ viewerId: e.target.value, activePanelId: null }),
       langVariant: { nl: lang === 'nl' ? 'dark' : 'ghost', en: lang === 'en' ? 'dark' : 'ghost' },
+      langSidebar, chevronDownIconRef,
       onSetLangNl: () => this.setState({ lang: 'nl' }, () => this.syncUseCaseLang()),
       onSetLangEn: () => this.setState({ lang: 'en' }, () => this.syncUseCaseLang()),
       viewerInitials: initials(viewerMeta.name),
