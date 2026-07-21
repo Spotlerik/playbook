@@ -321,10 +321,7 @@ class App extends React.Component {
           R('h1', { style: { margin: '12px 0 4px', fontSize: 34, fontWeight: 800, color: B.navy, letterSpacing: '-0.02em', lineHeight: 1.1 } }, T('What is the prospect actually struggling with?')),
           R('div', { style: { fontSize: 15, color: B.muted, maxWidth: 640 } }, T('Pick a challenge, then the specific pain. We will filter the menu to the two or three use cases that solve it.')),
         ),
-        this.props.hideHeader && R('div', { style: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 } },
-          R('div', { style: { fontSize: 11, fontWeight: 700, color: 'var(--fg3)', letterSpacing: '0.14em', textTransform: 'uppercase' } }, T('Industry')),
-          industrySwitch,
-        ),
+        null,
       ),
       R('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 } },
         d.challenges.map(c => {

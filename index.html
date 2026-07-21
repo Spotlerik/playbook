@@ -71,6 +71,12 @@
     </div>
 
     <div style="padding:0 var(--space-3) var(--space-2);">
+      <div onClick="{{ onOpenActivateChecker }}" style-hover="background:rgba(255,255,255,0.14);" style="display:flex; align-items:center; justify-content:{{ productsJustify }}; gap:8px; padding:9px 14px; border-radius:var(--radius-pill); border:1px solid rgba(255,255,255,0.22); background:rgba(255,255,255,0.05); cursor:pointer; transition:background var(--dur) var(--ease-out); margin-bottom:8px;">
+        <span ref="{{ activateIconRef }}" style="display:inline-flex; width:14px; height:14px; color:rgba(255,255,255,0.8); flex-shrink:0;"></span>
+        <sc-if value="{{ sidebarExpanded }}" hint-placeholder-val="{{ true }}">
+          <span style="font-size:12px; font-weight:700; color:rgba(255,255,255,0.8); white-space:nowrap;">Activate Checker</span>
+        </sc-if>
+      </div>
       <div onClick="{{ onOpenAdmin }}" style-hover="background:rgba(255,255,255,0.14);" style="display:flex; align-items:center; justify-content:{{ productsJustify }}; gap:8px; padding:9px 14px; border-radius:var(--radius-pill); border:1px solid {{ productsBorder }}; background:{{ productsBg }}; cursor:pointer; transition:background var(--dur) var(--ease-out);">
         <span ref="{{ productsIconRef }}" style="display:inline-flex; width:14px; height:14px; color:{{ productsFg }}; flex-shrink:0;"></span>
         <sc-if value="{{ sidebarExpanded }}" hint-placeholder-val="{{ true }}">
@@ -1281,6 +1287,8 @@ class Component extends DCLogic {
     // "Producten" links out to the live Spotler cloud product catalogue (new tab),
     // rather than opening the in-app admin view.
     const onOpenAdmin = () => { try { window.open('https://app.spotler.cloud/products', '_blank', 'noopener'); } catch (e) {} };
+    const activateIconRef = this.getIconRef('circle-check', 14);
+    const onOpenActivateChecker = () => { try { window.open('https://checkactivate.com/dashboard', '_blank', 'noopener'); } catch (e) {} };
     const productsBg = productsActive ? 'var(--cyan)' : 'rgba(255,255,255,0.05)';
     const productsBorder = productsActive ? 'var(--cyan)' : 'rgba(255,255,255,0.22)';
     const productsFg = productsActive ? '#ffffff' : 'rgba(255,255,255,0.8)';
@@ -1315,7 +1323,7 @@ class Component extends DCLogic {
         onBackToToolkit: () => this.setState({ view: 'toolkit' }),
         t_toolkitTitle: T.toolkitTitle, t_toolkitSub: T.toolkitSub, t_searchPlaceholder: T.searchPlaceholder,
         t_backToToolkit: T.backToToolkit, t_comingSoon: T.comingSoon, t_notBuiltYet: T.notBuiltYet,
-        productsIconRef, onOpenAdmin, productsBg, productsBorder, productsFg, productsJustify, t_navProducts: T.navProducts,
+        productsIconRef, onOpenAdmin, activateIconRef, onOpenActivateChecker, productsBg, productsBorder, productsFg, productsJustify, t_navProducts: T.navProducts,
         isAdminView, pipelineHealth, t_pipelineHealthTitle: T.pipelineHealthTitle, t_pipelineHealthNote: T.pipelineHealthNote,
         t_adminTitle: T.admin.title, t_adminSub: T.admin.sub, t_routingTitle: T.admin.routingTitle, t_routingBadge: T.admin.routingBadge, t_routingCaption: T.admin.routingCaption,
         routingSteps: T.admin.routingSteps, t_fallbackTitle: T.admin.fallbackTitle, t_fallbackText: T.admin.fallbackText, t_priorityTitle: T.admin.priorityTitle, t_priorityText: T.admin.priorityText,
@@ -1588,7 +1596,7 @@ class Component extends DCLogic {
       t_backToToolkit: T.backToToolkit,
       t_comingSoon: T.comingSoon,
       t_notBuiltYet: T.notBuiltYet,
-      productsIconRef, onOpenAdmin, productsBg, productsBorder, productsFg, productsJustify, t_navProducts: T.navProducts,
+      productsIconRef, onOpenAdmin, activateIconRef, onOpenActivateChecker, productsBg, productsBorder, productsFg, productsJustify, t_navProducts: T.navProducts,
       isAdminView, pipelineHealth, t_pipelineHealthTitle: T.pipelineHealthTitle, t_pipelineHealthNote: T.pipelineHealthNote,
       t_adminTitle: T.admin.title, t_adminSub: T.admin.sub, t_routingTitle: T.admin.routingTitle, t_routingBadge: T.admin.routingBadge, t_routingCaption: T.admin.routingCaption,
       routingSteps: T.admin.routingSteps, t_fallbackTitle: T.admin.fallbackTitle, t_fallbackText: T.admin.fallbackText, t_priorityTitle: T.admin.priorityTitle, t_priorityText: T.admin.priorityText,
