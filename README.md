@@ -47,7 +47,8 @@ All asset paths are relative, so it also works from a project sub-path.
 | `playbook-data.js` | Data layer. Exposes `listReps()` and `getViewerSnapshot(repId, period)` over a deterministically-generated representative dataset. Swap the body for a live HubSpot cut without touching anything upstream. |
 | `_ds/spotler-design-system-…/` | The Spotler design system: CSS tokens (`tokens/*.css`), `styles.css`, and `_ds_bundle.js` (React components: Button, Card, Badge, Input, Select, Spotlight). |
 | `usecases/` | The Use Case Menu sub-app (plain React). `app.js` defines `window.UseCaseApp`; `use_cases.js` + `strings_nl.js` are its data + Dutch strings; `uc-mockups.js` is a Web Component that draws the illustration mockups. `index.html` is a standalone entry. |
-| `demo-studio/` | Slot for the interactive sales Demo Studio tool (see note below). |
+| `demo-studio/` | The interactive **Spotler Sales Tool** — a single self-contained bundle (`index.html`). Loaded in an iframe by the Coaching Hub's Demo Studio view and by the standalone `demo/` page. |
+| `demo/` | Standalone **bilingual (NL / EN)** page that presents the Demo Studio at its own URL (`/demo/`): a Spotler-styled header with a language toggle, a "generates no HubSpot data" note, and the tool embedded below. Shareable on its own — no Coaching Hub shell required. |
 
 ## Notes on the import
 
@@ -58,11 +59,13 @@ A few things were adapted so the project runs as a standalone static site:
   therefore loads the same Open Sans family from Google Fonts (exactly as the
   Use Case Menu page already did). The type tokens still prefer *Greycliff CF*
   first, then Open Sans, then `system-ui`.
-- **Demo Studio** — `demo-studio/index.html` is a placeholder. The real tool is
-  a single self-contained bundle larger than the 256 KB per-file import limit,
-  so it could not be copied across automatically. Export it from the design
-  project and drop it in at that path to restore the live tool; everything else
-  works without it.
+- **Demo Studio** — `demo-studio/index.html` is the real self-contained Sales
+  Tool bundle. It is reachable two ways: embedded in the Coaching Hub's Demo
+  Studio view, and via the standalone **`/demo/`** page, which wraps it in a
+  bilingual (NL / EN) Spotler-styled chrome so it can be opened or shared at its
+  own URL. The wrapper text (title, intro, no-HubSpot-data note, controls)
+  switches language via the NL / EN toggle, `?lang=nl|en`, or a stored
+  preference; the embedded tool is a fixed bundle and keeps its own copy.
 - **React / Lucide** — loaded from unpkg at runtime (React 18.3.1, Lucide
   latest), matching the design project. The standalone Use Case Menu page loads
   React from the same CDN rather than vendoring the minified copies.

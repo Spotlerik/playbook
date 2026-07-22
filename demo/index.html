@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo Studio · Spotler Playbook</title>
+<meta name="description" content="Spotler Sales Tool — standalone demo studio. Oefen je verkoopdemo in een veilige, losstaande omgeving. / Practice your sales demo in a safe, standalone environment.">
+<link rel="icon" type="image/svg+xml" href="../assets/spotlight-yellow.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #002a4d;
+    --navy-shade: #001d36;
+    --cyan: #23afe6;
+    --yellow: #f0e306;
+    --radius-pill: 999px;
+    --font: 'Open Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    font-family: var(--font);
+    color: var(--navy);
+    background: var(--navy);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Top bar (navy) */
+  header {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 22px;
+    background: linear-gradient(180deg, color-mix(in oklch, var(--navy), white 12%) 0%, var(--navy) 60%, var(--navy-shade) 100%);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.06);
+  }
+  .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .lockup { display: flex; align-items: center; gap: 6px; }
+  .lockup img { height: 18px; width: auto; display: block; }
+  .lockup .pb { font-weight: 800; font-size: 19px; line-height: 1; letter-spacing: -0.01em; color: #fff; white-space: nowrap; }
+  .sep { width: 1px; height: 22px; background: rgba(255,255,255,0.2); flex-shrink: 0; }
+  .page-title { font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.9); white-space: nowrap; }
+
+  .controls { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+  .backlink {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12.5px; font-weight: 700; color: rgba(255,255,255,0.78);
+    text-decoration: none; white-space: nowrap;
+  }
+  .backlink:hover { color: #fff; }
+  .backlink svg { width: 14px; height: 14px; }
+  .lang { display: flex; gap: 6px; }
+  .lang button {
+    font-family: var(--font);
+    min-width: 42px; padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    border: 1px solid rgba(255,255,255,0.24);
+    background: transparent; color: rgba(255,255,255,0.82);
+    font-size: 12px; font-weight: 700; cursor: pointer;
+    transition: background .18s ease, color .18s ease, border-color .18s ease;
+  }
+  .lang button[aria-pressed="true"] {
+    background: var(--cyan); color: var(--navy); border-color: var(--cyan);
+  }
+
+  /* Info strip (light) */
+  .strip {
+    flex: 0 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap;
+    padding: 10px 22px;
+    background: #fff;
+    border-bottom: 1px solid #e3e9ef;
+  }
+  .intro { font-size: 13px; color: #33475b; font-weight: 600; }
+  .note {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 6px 13px; border-radius: var(--radius-pill);
+    background: color-mix(in srgb, var(--cyan) 12%, #fff);
+    border: 1px solid color-mix(in srgb, var(--cyan) 30%, #fff);
+    font-size: 11.5px; font-weight: 700; color: #0d5a7a;
+    white-space: nowrap;
+  }
+  .note svg { width: 13px; height: 13px; flex-shrink: 0; }
+  .newtab {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 700; color: var(--navy);
+    text-decoration: none; white-space: nowrap;
+  }
+  .newtab:hover { text-decoration: underline; }
+  .newtab svg { width: 13px; height: 13px; }
+  .strip-right { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+
+  /* Tool frame */
+  .frame-wrap { flex: 1 1 auto; min-height: 0; background: var(--navy); }
+  iframe { width: 100%; height: 100%; border: none; display: block; }
+
+  @media (max-width: 640px) {
+    .page-title, .sep { display: none; }
+    .strip { padding: 9px 16px; }
+    header { padding: 10px 16px; }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <a class="lockup" href="../" title="Spotler Playbook">
+        <img src="../assets/spotler-wordmark-white.svg" alt="Spotler" />
+        <span class="pb">playbook</span>
+      </a>
+      <span class="sep" aria-hidden="true"></span>
+      <span class="page-title" data-i18n="title">Demo Studio</span>
+    </div>
+    <div class="controls">
+      <a class="backlink" href="../">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+        <span data-i18n="back">Terug naar playbook</span>
+      </a>
+      <div class="lang" role="group" aria-label="Language">
+        <button type="button" data-lang="nl" aria-pressed="true">NL</button>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="strip">
+    <span class="intro" data-i18n="intro">Oefen je verkoopdemo in een veilige, losstaande omgeving.</span>
+    <div class="strip-right">
+      <span class="note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        <span data-i18n="note">Volledig geïsoleerd — er wordt geen data naar HubSpot geschreven.</span>
+      </span>
+      <a class="newtab" href="../demo-studio/index.html?fresh=1" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+        <span data-i18n="openTab">Openen in nieuw tabblad</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="frame-wrap">
+    <iframe src="../demo-studio/index.html?fresh=1" title="Spotler Demo Studio" allow="clipboard-write"></iframe>
+  </div>
+
+  <script>
+    // Bilingual chrome for the standalone Demo Studio page. The embedded tool is a
+    // self-contained bundle; this wrapper (title, intro, zero-data note, controls)
+    // is what switches between Dutch and English.
+    var STRINGS = {
+      nl: {
+        title: 'Demo Studio',
+        back: 'Terug naar playbook',
+        intro: 'Oefen je verkoopdemo in een veilige, losstaande omgeving.',
+        note: 'Volledig geïsoleerd — er wordt geen data naar HubSpot geschreven.',
+        openTab: 'Openen in nieuw tabblad'
+      },
+      en: {
+        title: 'Demo Studio',
+        back: 'Back to playbook',
+        intro: 'Practice your sales demo in a safe, standalone environment.',
+        note: 'Fully isolated — no data is written to HubSpot.',
+        openTab: 'Open in new tab'
+      }
+    };
+    var STORE_KEY = 'spotler-playbook:lang';
+
+    function readLang() {
+      // Default to Dutch, matching the rest of the playbook; an explicit ?lang=
+      // param or a preference stored on a previous visit to this page wins.
+      var q = new URLSearchParams(location.search).get('lang');
+      if (q === 'nl' || q === 'en') return q;
+      try { var s = localStorage.getItem(STORE_KEY); if (s === 'nl' || s === 'en') return s; } catch (e) {}
+      return 'nl';
+    }
+
+    function applyLang(lang) {
+      if (lang !== 'nl' && lang !== 'en') lang = 'nl';
+      var t = STRINGS[lang];
+      document.documentElement.lang = lang;
+      document.querySelectorAll('[data-i18n]').forEach(function (el) {
+        var k = el.getAttribute('data-i18n');
+        if (t[k] != null) el.textContent = t[k];
+      });
+      document.querySelectorAll('.lang button').forEach(function (b) {
+        b.setAttribute('aria-pressed', String(b.getAttribute('data-lang') === lang));
+      });
+      try { localStorage.setItem(STORE_KEY, lang); } catch (e) {}
+      var url = new URL(location.href);
+      url.searchParams.set('lang', lang);
+      history.replaceState(null, '', url);
+    }
+
+    document.querySelectorAll('.lang button').forEach(function (b) {
+      b.addEventListener('click', function () { applyLang(b.getAttribute('data-lang')); });
+    });
+
+    applyLang(readLang());
+  </script>
+</body>
+</html>
