@@ -702,7 +702,7 @@
 
   <sc-if value="{{ isDemoStudioView }}" hint-placeholder-val="{{ false }}">
     <div style="position:fixed; top:0; right:0; bottom:0; left:{{ demoStudioLeftInset }}; z-index:500; background:#fff; transition: left 0.22s var(--ease-out, ease);">
-      <iframe key="{{ demoStudioKey }}" src="demo-studio/index.html?fresh=1" title="Demo Studio" style="width:100%; height:100%; border:none; display:block;"></iframe>
+      <iframe key="{{ demoStudioKey }}" src="{{ demoStudioSrc }}" title="Demo Studio" style="width:100%; height:100%; border:none; display:block;"></iframe>
       <button onClick="{{ onExitDemoStudio }}" style-hover="background:rgba(0,42,77,0.95);" style="position:absolute; top:16px; right:16px; z-index:501; display:flex; align-items:center; gap:6px; padding:8px 14px; border:none; border-radius:var(--radius-pill); background:rgba(0,42,77,0.78); backdrop-filter:blur(8px); box-shadow:var(--shadow-md); color:#fff; font-family:var(--font-body); font-size:12.5px; font-weight:700; cursor:pointer;">
         <span ref="{{ exitIconRef }}" style="display:inline-flex; width:13px; height:13px; flex-shrink:0;"></span>
         {{ t_exitDemoStudio }}
@@ -1561,6 +1561,7 @@ class Component extends DCLogic {
       sidebarWidth, collapseIcon, onToggleCollapse, sidebarExpanded, sidebarCollapsed: collapsed,
       collapseIconRef, powerIconRef, sparklesIconRef, flameIconRef, clockIconRef, arrowRightIconRef, trophyIconRef, arrowLeftIconRef, fileTextIconRef, exitIconRef, infoIconRef, t_demoNoData: T.demoNoData,
       isDemoStudioView: view === 'demo', demoStudioKey: this.state.demoStudioKey || 0,
+      demoStudioSrc: 'demo-studio/index.html?fresh=1&rep=' + encodeURIComponent(viewerMeta.name),
       demoStudioFullscreen: this.state.demoStudioFullscreen,
       demoStudioLeftInset: this.state.demoStudioFullscreen ? '0' : sidebarWidth,
       onExitDemoStudio: () => this.setState({ view: 'home', demoStudioFullscreen: false }), t_exitDemoStudio: T.exitDemoStudio,
