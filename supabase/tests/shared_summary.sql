@@ -169,30 +169,35 @@ begin
     'de contactnaam lekt mee in de gedeelde samenvatting');
 
   -- -----------------------------------------------------------------------
-  -- 10. interne notities zijn een HARDE uitsluiting
+  -- 10. interne notities EN prijsindicatie zijn HARDE uitsluitingen
   -- -----------------------------------------------------------------------
   -- Ook als included_blocks ze expliciet bevat. De write-trigger filtert ze er
-  -- al uit; hier controleren we het eindresultaat.
+  -- al uit; hier controleren we het eindresultaat. Prijsindicatie zat eerst in
+  -- de "standaard uit maar aan te zetten"-categorie; dat is bewust strenger
+  -- gemaakt, want één verkeerde klik is dan genoeg en een prijs in een
+  -- blijvende, doorstuurbare URL hoort er niet.
   update public.session_shares
-     set included_blocks = '["summary","discovery","internal_notes","rep_notes"]'::jsonb
+     set included_blocks = '["summary","discovery","internal_notes","rep_notes","pricing"]'::jsonb
    where token = tok;
 
   perform pg_temp.fail_if(
     (select included_blocks from public.session_shares where token = tok) ? 'internal_notes',
     'internal_notes bleef in included_blocks staan na een schrijfactie');
+  perform pg_temp.fail_if(
+    (select included_blocks from public.session_shares where token = tok) ? 'pricing',
+    'pricing bleef in included_blocks staan na een schrijfactie');
 
   res := public.get_shared_summary(tok, g);
   perform pg_temp.fail_if((res->'blocks') ? 'internal_notes',
     'interne notities kwamen mee terwijl ze expliciet waren toegevoegd');
+  perform pg_temp.fail_if((res->'blocks') ? 'pricing',
+    'prijsindicatie kwam mee terwijl die expliciet was toegevoegd');
 
-  -- Prijsindicatie is géén harde uitsluiting maar een bewuste keuze: standaard
-  -- uit, wel deelbaar als de rep hem aanzet. Zie de notitie in de README.
-  update public.session_shares
-     set included_blocks = '["summary","pricing"]'::jsonb
-   where token = tok;
-  res := public.get_shared_summary(tok, g);
-  perform pg_temp.fail_if(not ((res->'blocks') ? 'pricing'),
-    'prijsindicatie kwam niet mee terwijl de rep hem bewust had aangezet');
+  -- Ook via create_session_share() met een expliciete blokkenlijst komt hij er
+  -- niet doorheen — de rep kan hem dus ook bij het aanmaken niet aanzetten.
+  perform pg_temp.fail_if(
+    (public.create_session_share(pg_temp.v('sess')::uuid, '["summary","pricing"]'::jsonb)).included_blocks ? 'pricing',
+    'prijsindicatie glipte binnen via create_session_share');
 
   update public.session_shares set included_blocks = '["summary","discovery"]'::jsonb where token = tok;
 

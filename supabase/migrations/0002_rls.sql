@@ -110,12 +110,17 @@ $$;
 -- ook niet als included_blocks ze zou bevatten. Bewust hardgecodeerd en
 -- IMMUTABLE: dit wijzigen hoort een migratie te zijn die je terugziet in de
 -- geschiedenis, geen rij die een manager per ongeluk leeg kan maken.
+--
+-- 'pricing' hoort hier sinds de tweede ronde ook bij. Eerder was het "standaard
+-- uit maar aan te zetten"; dat betekent dat één verkeerde klik genoeg is, en een
+-- prijs in een link die blijft bestaan en doorgestuurd kan worden hoort er niet.
+-- Wil een rep een prijs delen, dan stuurt hij een offerte.
 create or replace function public.never_shareable_blocks()
 returns text[]
 language sql
 immutable
 as $$
-  select array['internal_notes','rep_notes','coaching_notes','internal']::text[];
+  select array['internal_notes','rep_notes','coaching_notes','internal','pricing']::text[];
 $$;
 
 -- Eigenaarschap. Security definer zodat de RLS van de ene tabel niet die van

@@ -171,9 +171,9 @@ begin
     v_domain := null;
   end if;
 
-  -- Prijsindicatie standaard uit: van alle blokken is dit de enige die
-  -- commercieel tegen je kan werken als de link wordt doorgestuurd. De rep mag
-  -- hem aanzetten, maar dat moet een bewuste keuze zijn.
+  -- Prijsindicatie staat hier niet in en kan er ook niet in gezet worden: hij
+  -- staat in never_shareable_blocks() en wordt door de write-trigger uit elke
+  -- included_blocks gefilterd. Zie de toelichting daar.
   v_blocks := coalesce(p_included_blocks,
     public.app_setting('share_default_blocks', '["summary","discovery","usecases","screens","next_steps"]'::jsonb));
 

@@ -146,20 +146,95 @@ blok **is** de blootstellingslijst. Blootgesteld aan `authenticated`:
 `share_access_attempts` — die zijn alleen bereikbaar via de functies in `0003`.
 Aan `anon`: geen enkele tabel, alleen drie RPC's.
 
-### Tests draaien
+### De vier testsets draaien
+
+Draai deze **in deze volgorde**, tegen het echte project, voordat de anon key in
+de repo komt. Je hebt de connection string uit *Project Settings → Database*
+nodig; die bevat het databasewachtwoord, dus zet hem in je shell en niet in een
+bestand:
 
 ```bash
-psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f supabase/tests/rls.sql
-psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f supabase/tests/shared_summary.sql
-psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f supabase/tests/retention.sql
-
-cd scripts && npm install && npm run test-rls
+export SUPABASE_DB_URL='postgresql://postgres:<wachtwoord>@db.<project>.supabase.co:5432/postgres'
 ```
 
-De SQL-tests rollen zichzelf terug en laten niets achter. Ze geven geen output
-behalve een slotmelding; elke gefaalde controle klapt met een `FAIL —` regel.
-`test-rls.mjs` maakt drie testaccounts aan, logt daarmee echt in met de anon key
-en ruimt ze daarna op — de echte accounts worden niet aangeraakt.
+De drie SQL-sets rollen zichzelf terug: ze laten niets in de database achter,
+ook niet als ze slagen. Je kunt ze zo vaak draaien als je wilt.
+
+**1 — RLS op de tabellen**
+
+```bash
+psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -q -f supabase/tests/rls.sql
+```
+
+Goed als je precies dit ziet, en verder niets:
+
+```
+NOTICE:  RLS-test geslaagd — alle verboden acties zijn geweigerd.
+```
+
+**2 — de gedeelde samenvatting**
+
+```bash
+psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -q -f supabase/tests/shared_summary.sql
+```
+
+```
+NOTICE:  get_shared_summary-testset geslaagd.
+```
+
+**3 — de bewaartermijn**
+
+```bash
+psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -q -f supabase/tests/retention.sql
+```
+
+```
+NOTICE:  Bewaartermijn-test geslaagd.
+```
+
+**4 — de echte API, met de publieke anon key**
+
+Deze test hoort er apart bij: de eerste drie testen de policies ín de database,
+deze test of PostgREST, de policies en de anon key *samen* dichtzitten. Dat is de
+combinatie die straks in de browser draait.
+
+```bash
+cd scripts
+npm install
+SUPABASE_URL=... SUPABASE_ANON_KEY=... SUPABASE_SERVICE_ROLE_KEY=... npm run test-rls
+```
+
+Je krijgt een regel per controle. Goed als de laatste twee regels zijn:
+
+```
+0 gefaald.
+Alles dicht. De anon key mag naar de frontend.
+```
+
+Het script maakt drie eigen testaccounts aan (`rls-test-…@example.test`), logt
+daarmee écht in met de anon key, en ruimt ze aan het eind weer op. De veertien
+echte accounts worden niet aangeraakt. De `service_role` key wordt alleen
+gebruikt voor dat aanmaken en opruimen, nooit voor een controle zelf.
+
+**Wat "fout" eruitziet.** Elke gefaalde controle begint met `FAIL —` en zegt
+precies wat er wél kon terwijl het niet mocht, bijvoorbeeld:
+
+```
+ERROR:  FAIL — rep A leest sessie van rep B : 1 rij(en) zichtbaar/geraakt, verwacht 0
+```
+
+Bij een `FAIL` stopt de SQL-set direct en rolt hij terug; `test-rls.mjs` draait
+door en somt aan het eind alles op met exit code 1. In beide gevallen: **niet de
+anon key plaatsen.** Repareer de policy in `0002_rls.sql`, draai die migratie
+opnieuw (hij is idempotent) en draai de test opnieuw.
+
+**Deze tests zijn zelf getest.** Ze zijn gecontroleerd door de policies
+opzettelijk te slopen — een `using (true)` op `demo_sessions`, de
+rolwijziging-trigger eraf, `anon` leestoegang op `profiles`, de harde uitsluiting
+van interne notities en van de prijsindicatie eruit, de `revoked_at`-controle
+eruit, en de bewaartermijn hardcoded in plaats van uit `app_settings`. Alle
+zeven werden betrapt met een `FAIL`, en na herstel was alles weer groen. Een test
+die niets kan detecteren is geen test.
 
 ### Een gebruiker toevoegen
 
@@ -227,8 +302,35 @@ Twee afspraken die het schema aan beide apps oplegt:
   samenvattingsblok één sleutel. `session_shares.included_blocks` is een array
   van diezelfde sleutels.
 - Blokken uit `never_shareable_blocks()` (`internal_notes`, `rep_notes`,
-  `coaching_notes`, `internal`) komen er nooit uit — niet als instelling maar als
-  harde uitsluiting, afgedwongen bij het schrijven én bij het lezen.
+  `coaching_notes`, `internal`, `pricing`) komen er nooit uit — niet als
+  instelling maar als harde uitsluiting, afgedwongen bij het schrijven én bij het
+  lezen. Bouw in de demo studio dus geen schakelaar voor deze blokken: de
+  database weigert ze hoe dan ook.
+
+### Wat wel en niet deelbaar is
+
+De rep kiest per keer welke blokken mee mogen en kan de link op elk moment
+uitzetten (`revoked_at` vullen). Vervaldatum standaard 90 dagen, in te stellen
+per share.
+
+Twee categorieën blokken zijn **structureel niet deelbaar**, en dat is een harde
+uitsluiting in `never_shareable_blocks()` — geen standaardinstelling die iemand
+kan omzetten:
+
+- **Interne notities van de rep** (`internal_notes`, `rep_notes`,
+  `coaching_notes`, `internal`). Nooit, op geen enkele manier.
+- **Prijsindicatie** (`pricing`). Dit was eerst "standaard uit, de rep mag hem
+  aanzetten". Dat is bewust strenger gemaakt: standaard-uit betekent dat één
+  verkeerde klik genoeg is, en een prijs in een URL die blijft bestaan en
+  doorgestuurd kan worden hoort er niet. Wil een rep een prijs delen, dan stuurt
+  hij een offerte.
+
+De uitsluiting geldt op drie plekken, zodat er geen achterdeur is: bij
+`create_session_share()`, bij elke `insert`/`update` op `session_shares` (de
+write-trigger schrijft de blokken eruit), en nog een keer bij het lezen in
+`get_shared_summary()`. Wijzigen kan alleen via een migratie op
+`never_shareable_blocks()` — dat staat dan in de geschiedenis, in plaats van in
+een rij die iemand stilletjes leeg maakt.
 
 ### Bewaartermijn
 
@@ -261,3 +363,28 @@ is, en waar de volgende sessies over gaan:
 - **Het opslaan van demo-sessies** vanuit de demo studio.
 - **De live HubSpot- en Jiminny-cijfers.** Tot die er zijn genereert
   `getViewerSnapshot()` representatieve weekcijfers, zoals voorheen.
+
+### Openstaand
+
+Bewust nog niet gedaan, met de reden erbij, zodat het niet stilletjes verdwijnt.
+
+- **De oude rep-dataset staat nog in de git-geschiedenis.** Uit de bundle is hij
+  weg, maar `git log` heeft de commits met de veertien voornamen en hun
+  scores nog. Bewust niet herschreven: een force-push op een publieke repo breekt
+  clones en forks, en de oude objecten blijven vaak alsnog bestaan in caches en
+  in forks die al gemaakt zijn — je haalt het er dus niet echt uit en je breekt
+  wel iets. **Opgelost bij de verhuizing naar `playbook.spotler.com`:** als daar
+  een nieuwe repo wordt aangemaakt, begint de geschiedenis schoon. Neem dit mee
+  op het moment dat die verhuizing wordt ingepland.
+- **De sessie wordt nog niet gedeeld tussen subdomeinen.** `COOKIE_DOMAIN` staat
+  op `null` omdat DNS er nog niet is, en op `github.io` kan het sowieso niet
+  (Public Suffix List). Eén constante omzetten zodra `playbook.spotler.com` en
+  `demo.spotler.com` bestaan.
+- **`robots.txt` doet nog niets.** Een GitHub Pages *project*-site serveert
+  robots.txt alleen vanaf de domeinroot, en die hoort bij de user-site. Het
+  bestand staat er alvast klaar voor de verhuizing; de `noindex`-tag op de
+  samenvattingspagina zelf komt bij de bouw van die pagina.
+- **`/demo/` staat nog buiten de login.** Die standalone pagina toont de demo
+  studio-bundel zonder sessie. Dat lekt op dit moment niets — de tool bewaart
+  alles in localStorage en praat nog niet met Supabase — maar zodra de demo
+  studio sessies gaat opslaan, moet die pagina achter dezelfde auth-gate.

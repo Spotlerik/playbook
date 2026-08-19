@@ -24,7 +24,7 @@ insert into public.app_settings (key, value, description) values
    'Standaard vervaltermijn van een deelbare link, in dagen. De rep kan hem per share aanpassen.'),
 
   ('share_default_blocks', '["summary","discovery","usecases","screens","next_steps"]'::jsonb,
-   'Blokken die standaard aanstaan bij een nieuwe share. Prijsindicatie (pricing) staat er BEWUST niet in: van alle blokken is dat de enige die commercieel tegen je kan werken als de link wordt doorgestuurd. De rep mag hem aanzetten, maar niet zonder bewuste keuze.'),
+   'Blokken die standaard aanstaan bij een nieuwe share. Deze lijst kan alleen blokken bevatten die überhaupt deelbaar zijn: prijsindicatie en interne notities staan in never_shareable_blocks() en worden er sowieso uit gefilterd, ook als iemand ze hier toevoegt.'),
 
   ('share_request_rate_limit_per_hour', '10'::jsonb,
    'Maximaal aantal adresverificatie-pogingen per token per uur.'),
