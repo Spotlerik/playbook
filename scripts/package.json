@@ -1,0 +1,14 @@
+{
+  "name": "playbook-scripts",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Beheerscripts voor de Spotler Playbook Supabase-database. Bewust apart van de site: de site zelf heeft geen buildstap en geen node_modules.",
+  "scripts": {
+    "create-users": "node create-users.mjs",
+    "test-rls": "node test-rls.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.112.3"
+  }
+}
