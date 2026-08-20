@@ -27,6 +27,7 @@ create or replace function public.generate_share_token()
 returns text
 language sql
 volatile
+set search_path = public, extensions, pg_temp
 as $$
   select translate(encode(gen_random_bytes(16), 'base64'), '+/=', '-_');
 $$;
@@ -37,6 +38,7 @@ create or replace function public.hash_token(t text)
 returns text
 language sql
 immutable
+set search_path = public, extensions, pg_temp
 as $$
   select encode(digest(coalesce(t, ''), 'sha256'), 'hex');
 $$;
@@ -51,7 +53,7 @@ create or replace function public.register_share_attempt(p_token text, p_kind te
 returns boolean
 language plpgsql
 security definer
-set search_path = public, pg_temp
+set search_path = public, extensions, pg_temp
 as $$
 declare
   v_hash  text := public.hash_token(p_token);
@@ -89,7 +91,7 @@ create or replace function public.email_may_access_share(p_share_id uuid, p_emai
 returns boolean
 language plpgsql
 security definer
-set search_path = public, pg_temp
+set search_path = public, extensions, pg_temp
 as $$
 declare
   v_share   public.session_shares%rowtype;
@@ -147,7 +149,7 @@ create function public.create_session_share(
 ) returns public.session_shares
 language plpgsql
 security definer
-set search_path = public, pg_temp
+set search_path = public, extensions, pg_temp
 as $$
 declare
   v_contact_email text;
@@ -200,7 +202,7 @@ create function public.add_share_email(p_share_id uuid, p_email text)
 returns public.session_shares
 language plpgsql
 security definer
-set search_path = public, pg_temp
+set search_path = public, extensions, pg_temp
 as $$
 declare
   v_email text := lower(btrim(p_email));
@@ -233,7 +235,7 @@ create function public.remove_share_email(p_share_id uuid, p_email text)
 returns public.session_shares
 language plpgsql
 security definer
-set search_path = public, pg_temp
+set search_path = public, extensions, pg_temp
 as $$
 declare
   v_email text := lower(btrim(p_email));
@@ -272,7 +274,7 @@ create function public.get_share_gate(share_token text)
 returns jsonb
 language plpgsql
 security definer
-set search_path = public, pg_temp
+set search_path = public, extensions, pg_temp
 as $$
 declare
   v_company text;
@@ -311,7 +313,7 @@ create function public.request_shared_summary_access(share_token text, recipient
 returns jsonb
 language plpgsql
 security definer
-set search_path = public, pg_temp
+set search_path = public, extensions, pg_temp
 as $$
 declare
   v_share_id uuid;
@@ -359,7 +361,7 @@ create function public.get_shared_summary(share_token text, p_access_grant text 
 returns jsonb
 language plpgsql
 security definer
-set search_path = public, pg_temp
+set search_path = public, extensions, pg_temp
 as $$
 declare
   v_share   public.session_shares%rowtype;
@@ -457,7 +459,7 @@ create function public.anonymize_expired_prospects()
 returns int
 language plpgsql
 security definer
-set search_path = public, pg_temp
+set search_path = public, extensions, pg_temp
 as $$
 declare
   v_months int := coalesce((public.app_setting('prospect_retention_months', '24'::jsonb))::text::int, 24);

@@ -22,7 +22,7 @@ returns boolean
 language sql
 stable
 security definer
-set search_path = public, pg_temp
+set search_path = public, extensions, pg_temp
 as $$
   select exists (
     select 1 from public.profiles p
@@ -57,7 +57,7 @@ returns boolean
 language sql
 stable
 security definer
-set search_path = public, pg_temp
+set search_path = public, extensions, pg_temp
 as $$
   select exists (
     select 1 from public.blocked_domains b
@@ -82,7 +82,7 @@ returns boolean
 language sql
 stable
 security definer
-set search_path = public, pg_temp
+set search_path = public, extensions, pg_temp
 as $$
   select exists (
     select 1
@@ -131,7 +131,7 @@ returns boolean
 language sql
 stable
 security definer
-set search_path = public, pg_temp
+set search_path = public, extensions, pg_temp
 as $$
   select exists (
     select 1 from public.demo_sessions s
@@ -144,7 +144,7 @@ returns boolean
 language sql
 stable
 security definer
-set search_path = public, pg_temp
+set search_path = public, extensions, pg_temp
 as $$
   select exists (
     select 1 from public.demo_sessions s
@@ -160,7 +160,7 @@ returns boolean
 language sql
 stable
 security definer
-set search_path = public, pg_temp
+set search_path = public, extensions, pg_temp
 as $$
   select exists (
     select 1
@@ -176,7 +176,7 @@ returns jsonb
 language sql
 stable
 security definer
-set search_path = public, pg_temp
+set search_path = public, extensions, pg_temp
 as $$
   select coalesce((select s.value from public.app_settings s where s.key = p_key), p_default);
 $$;
@@ -194,7 +194,7 @@ create or replace function public.validate_session_share()
 returns trigger
 language plpgsql
 security definer
-set search_path = public, pg_temp
+set search_path = public, extensions, pg_temp
 as $$
 declare
   addr        text;
@@ -262,7 +262,7 @@ create or replace function public.validate_trusted_domain()
 returns trigger
 language plpgsql
 security definer
-set search_path = public, pg_temp
+set search_path = public, extensions, pg_temp
 as $$
 begin
   new.domain := lower(btrim(new.domain));
@@ -289,7 +289,7 @@ create or replace function public.guard_profile_update()
 returns trigger
 language plpgsql
 security definer
-set search_path = public, pg_temp
+set search_path = public, extensions, pg_temp
 as $$
 begin
   new.email := lower(btrim(new.email));

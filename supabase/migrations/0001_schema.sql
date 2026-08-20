@@ -15,7 +15,24 @@
 -- in hetzelfde bestand.
 -- ============================================================================
 
-create extension if not exists pgcrypto;
+-- pgcrypto levert gen_random_bytes() (128-bit tokens) en digest() (hashen van
+-- tokens in de rate-limit log).
+--
+-- LET OP — Supabase installeert pgcrypto in het schema `extensions`, niet in
+-- `public`. Een kale `create extension if not exists pgcrypto` is daar dus een
+-- no-op die de extensie laat staan waar hij staat, terwijl onze SECURITY
+-- DEFINER functies een vastgepind `search_path` hebben. Zonder `extensions` in
+-- dat pad bestaan gen_random_bytes() en digest() voor die functies niet en
+-- klapt 0003 er meteen uit.
+--
+-- Vandaar deze drie regels: schema aanmaken als het er nog niet is, de extensie
+-- daarin installeren als hij nog nergens staat, en in élke functie hieronder
+-- `search_path = public, extensions, pg_temp` pinnen. Dat werkt zowel op
+-- Supabase (pgcrypto in `extensions`) als op een kale Postgres (pgcrypto in
+-- `public`).
+create schema if not exists extensions;
+create extension if not exists pgcrypto with schema extensions;
+grant usage on schema extensions to anon, authenticated, service_role;
 
 -- ---------------------------------------------------------------------------
 -- Hulpje: constraint toevoegen zonder te klappen als hij er al is.
@@ -26,6 +43,7 @@ create or replace function public._ensure_constraint(
   p_definition text
 ) returns void
 language plpgsql
+set search_path = public, pg_temp
 as $$
 begin
   if not exists (

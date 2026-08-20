@@ -236,6 +236,50 @@ eruit, en de bewaartermijn hardcoded in plaats van uit `app_settings`. Alle
 zeven werden betrapt met een `FAIL`, en na herstel was alles weer groen. Een test
 die niets kan detecteren is geen test.
 
+### Waar het echte project kan afwijken van de lokale controle
+
+Alles in deze repo is vóór oplevering gedraaid tegen een lokale PostgreSQL 16
+met een **handgebouwde nabootsing** van een leeg Supabase-project: het
+`auth`-schema, `auth.uid()`, en de rollen `anon` / `authenticated` /
+`service_role`. Dat vangt veel, maar niet alles. Hieronder staat waar de twee
+omgevingen uit elkaar kunnen lopen, zodat je weet waar je op moet letten en
+welke fouten *niets* over je policies zeggen.
+
+**Verbind met de directe connectie, niet met de pooler.** De SQL-testsets
+gebruiken tijdelijke tabellen, `set_config()` en `reset role`. Dat vraagt een
+sessie, en de transaction-mode pooler (poort **6543**) geeft je die niet
+betrouwbaar. Neem de connection string op poort **5432** uit *Project Settings →
+Database*. Krijg je onverklaarbare fouten over ontbrekende temp-tabellen of een
+rol die niet terugschakelt, dan is dit vrijwel zeker de oorzaak.
+
+**Draai alle vier de migraties als dezelfde rol.** SECURITY DEFINER functies
+draaien als hun eigenaar, en die eigenaar is de rol die de migratie uitvoerde.
+`is_manager()` en de `owns_*()`-functies leunen erop dat die eigenaar de tabellen
+bezit en dus RLS overslaat. Migraties half als `postgres` en half via een ander
+kanaal draaien geeft moeilijk te vinden gedrag. Gebruik voor alles de SQL-editor,
+of voor alles psql als `postgres`.
+
+**Wat de lokale controle NIET kon testen — en wat dat betekent:**
+
+| Verschil | Waar het misgaat, en wat je dan ziet |
+| --- | --- |
+| **PostgREST bestaat lokaal niet.** De drie SQL-sets praten rechtstreeks met de database. Ze zeggen dus niets over de HTTP-laag: de schema-cache, hoe grants op endpoints worden afgebeeld, embedded queries (`select=*,prospects(*)`), en het `authenticator` → `SET ROLE`-mechanisme. | Dit is het grootste gat. `scripts/test-rls.mjs` dekt precies dit, en is als enige van de vier **nog nooit tegen een echte omgeving gedraaid**. Als er ergens een verrassing zit, zit hij daar. Draai die set dus echt, en niet alleen de drie SQL-sets. |
+| **Schema-cache van PostgREST.** Na een migratie kent de API een nieuwe tabel niet meteen. | Een `PGRST205` / "Could not find the table in the schema cache" vlak na het migreren. Wacht een paar seconden of draai `notify pgrst, 'reload schema';`, en probeer opnieuw voordat je gaat debuggen. Geen policy-probleem. |
+| **JWT-claims.** Lokaal is alleen `sub` en `role` gezet; een echte Supabase-JWT bevat ook `aud`, `exp`, `email`, `app_metadata`, `session_id`, `aal`, `amr`. `auth.uid()` leest alleen `sub`, dus het hoort identiek te werken. | Zou het tóch afwijken, dan zie je dat in `test-rls.mjs` (die gebruikt echte JWT's) en niet in de SQL-sets. Symptoom: een rep ziet nul eigen rijen omdat `auth.uid()` null teruggeeft. |
+| **`auth.users` is echt.** De lokale stub heeft elf kolommen; de echte tabel heeft er ruim dertig, met eigen triggers, en is eigendom van `supabase_auth_admin`. De SQL-sets schrijven er rechtstreeks in omdat `profiles` er met een foreign key naar verwijst. | Elke SQL-set begint nu met een **preflight** die dit vooraf probeert. Faalt het, dan krijg je een expliciete melding dat dit de testopstelling is en niet je beveiliging, met de verwijzing naar `test-rls.mjs` — dat script maakt zijn gebruikers via de ondersteunde Admin API. |
+| **`postgres` is op Supabase geen superuser.** Lokaal wel. | Relevant voor `create extension` en `create schema` in `0001`. Op Supabase bestaat `extensions` al en is pgcrypto al geïnstalleerd, dus beide regels zijn no-ops. Krijg je hier toch een rechtenfout, laat het weten voordat je verder gaat. |
+| **pgcrypto staat op Supabase in het schema `extensions`, niet in `public`.** | Dit *was* een echte fout: `0003` klapte er volledig uit met `function gen_random_bytes(integer) does not exist`. Opgelost door `extensions` in het `search_path` van elke functie te pinnen, en daarna geverifieerd tegen beide indelingen. Vermeld hier zodat niemand dat pad later "opschoont" en de fout terugzet. |
+
+**Wat de testruns achterlaten.** De drie SQL-sets rollen zichzelf volledig terug.
+`test-rls.mjs` ruimt zijn accounts, sessies en shares op, maar laat twee rijen
+achter in `share_access_attempts` — dat is de rate-limit log en die bevat alleen
+een hash. Onschadelijk; opruimen mag maar hoeft niet.
+
+**Als iets afwijkt van wat hier staat, is dat interessant.** Vooral bij
+`test-rls.mjs`: als daar een controle faalt die lokaal slaagde, dan doet de
+HTTP-laag iets anders dan de database — en dat wil je weten vóór er data in gaat,
+niet erna.
+
 ### Een gebruiker toevoegen
 
 1. Zet de persoon in `scripts/roster.mjs` (naam, e-mail in kleine letters, rol
@@ -388,3 +432,70 @@ Bewust nog niet gedaan, met de reden erbij, zodat het niet stilletjes verdwijnt.
   studio-bundel zonder sessie. Dat lekt op dit moment niets — de tool bewaart
   alles in localStorage en praat nog niet met Supabase — maar zodra de demo
   studio sessies gaat opslaan, moet die pagina achter dezelfde auth-gate.
+  Volledige overdracht hieronder.
+
+#### Overdracht: `/demo/` achter de login (aparte sessie)
+
+Deze paragraaf is geschreven voor iemand die de bouw van het fundament niet
+heeft meegemaakt. Alles wat je nodig hebt staat hier of in de bestanden die
+hier genoemd worden.
+
+**Neem deze twee bestanden letterlijk over. Niet nabouwen, niet aanpassen:**
+
+| Bestand | Wat het doet | Wat er absoluut hetzelfde moet blijven |
+| --- | --- | --- |
+| `supabase-config.js` | Project-URL, anon key, cookiedomein, cookienaam. | `STORAGE_KEY` en `COOKIE_DOMAIN`. Wijkt één van die twee af, dan schrijven de twee apps hun sessie in verschillende cookies en logt de ene de andere effectief uit. Het symptoom is "ik moet steeds opnieuw inloggen", en dat is lastig te herleiden. |
+| `supabase-client.js` | De Supabase-client, de cookie-storage (inclusief het splitsen over `naam.0`, `naam.1`, … omdat een sessie groter is dan 4 KB), en `signIn` / `signOut` / `getSession` / `getMyProfile`. | Alles. Ook de chunkgrootte (3180) en de cookie-attributen. |
+
+`auth-gate.js` is *niet* zo'n bestand: dat is de playbook-schil (overlay,
+Nederlandse teksten, het verbergen van `<x-dc>`). Bouw voor de demo studio een
+eigen gate in de stijl van die app, maar laat hem dezelfde vier functies uit
+`supabase-client.js` gebruiken en dezelfde volgorde aanhouden:
+
+1. Vergrendel de pagina vóór de app boot.
+2. `getSession()` — geen sessie? Toon het inlogscherm.
+3. `getMyProfile()` — geen profielrij? Log uit en weiger toegang. Een geldig
+   auth-account zonder profiel heeft geen naam, geen rol en geen team; daar kan
+   de app niets mee.
+4. Pas daarna de app laten laden en de eerste query doen.
+
+In het playbook is stap 4 opgelost met een top-level `await` in
+`playbook-data.js` op een promise die de gate zet. Dat is één manier; het gaat
+erom dat er geen query vertrekt voordat stap 3 klaar is.
+
+**Schema-afspraken waar de demo studio zich aan moet houden**
+
+Het schema en de RLS voor `demo_sessions`, `prospects` en `session_shares`
+staan er al. Wat de demo studio bouwt is het lezen en schrijven ervan. Vier
+afspraken, allemaal afgedwongen in de database:
+
+1. **`demo_sessions.state` bevat een object onder de sleutel `blocks`**, met per
+   samenvattingsblok één sleutel. `session_shares.included_blocks` is een array
+   van diezelfde sleutels. `get_shared_summary()` leest `state -> 'blocks' -> <sleutel>`
+   voor elk vrijgegeven blok; sleutels die niet in `blocks` staan komen simpelweg
+   niet in het antwoord.
+2. **Blokken uit `never_shareable_blocks()` zijn nooit deelbaar**: momenteel
+   `internal_notes`, `rep_notes`, `coaching_notes`, `internal` en `pricing`.
+   Bouw hier geen schakelaar voor — de database filtert ze eruit bij het
+   aanmaken, bij elke schrijfactie en nog een keer bij het lezen. Een
+   UI-schakelaar zou dus een knop zijn die niets doet.
+3. **Maak shares via `create_session_share(session_id, included_blocks, expiry_days)`**,
+   niet met een directe `insert`. Die functie leidt `allowed_domain` af uit het
+   e-mailadres van het contactpersoon en laat het leeg als dat een publiek of
+   eigen domein is. Doe je dat zelf, dan mis je die regel.
+4. **Adressen toevoegen en verwijderen gaat via `add_share_email(share_id, email)`
+   en `remove_share_email(share_id, email)`**, niet via een `update` op
+   `allowed_emails`. Daar zit de validatie (geldig adres, geen wegwerpadres) en
+   het intrekken van lopende toegang in.
+
+**Twee dingen om te weten over de rechten**
+
+- Een rep heeft volledige rechten op zijn eigen `demo_sessions` (`rep_id = auth.uid()`)
+  en leest niets van een ander. Een manager leest alles maar schrijft niets van
+  een ander. Zet `rep_id` dus altijd op `auth.uid()`; een insert op naam van
+  iemand anders wordt geweigerd.
+- Een prospect wordt aangemaakt vóór de sessie die ernaar verwijst. Daarom is
+  `prospects.created_by` er, met `default auth.uid()`. Laat die default staan.
+
+**Als je klaar bent**, zet `/demo/` en `demo-studio/index.html` achter de gate en
+haal het `Openstaand`-punt hierboven weg.

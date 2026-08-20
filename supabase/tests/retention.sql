@@ -13,6 +13,38 @@
 
 begin;
 
+-- ---------------------------------------------------------------------------
+-- Preflight: mogen we hier testgebruikers aanmaken?
+-- ---------------------------------------------------------------------------
+-- Deze test zet rijen rechtstreeks in auth.users, omdat profiles daar met een
+-- foreign key naar verwijst. Die tabel is van `supabase_auth_admin`; of de rol
+-- waarmee jij verbindt erin mag schrijven verschilt per Supabase-versie en per
+-- manier van verbinden. Faalt dat, dan zegt dat NIETS over je policies — het is
+-- de testopstelling die niet mag, niet de beveiliging die lek is. Daarom een
+-- duidelijke melding in plaats van een cryptische permission denied halverwege.
+-- ---------------------------------------------------------------------------
+do $$
+declare probe uuid := gen_random_uuid();
+begin
+  begin
+    insert into auth.users (instance_id, id, aud, role, email, encrypted_password,
+                            email_confirmed_at, created_at, updated_at,
+                            raw_app_meta_data, raw_user_meta_data)
+    values ('00000000-0000-0000-0000-000000000000', probe, 'authenticated', 'authenticated',
+            'preflight-' || probe || '@example.test', '', now(), now(), now(),
+            '{}'::jsonb, '{}'::jsonb);
+    delete from auth.users where id = probe;
+  exception when others then
+    raise exception E'Deze test kan geen testgebruikers aanmaken in auth.users.\n'
+      '  Oorzaak: %\n'
+      '  Dit is een beperking van de testopstelling, GEEN uitspraak over je policies.\n'
+      '  Verbind als de `postgres`-rol (connection string uit Project Settings -> Database),\n'
+      '  of sla deze set over en draai scripts/test-rls.mjs: dat script maakt zijn\n'
+      '  gebruikers via de ondersteunde Admin API en dekt dezelfde controles via de\n'
+      '  echte HTTP-API.', SQLERRM;
+  end;
+end $$;
+
 create temporary table t3 (k text primary key, v uuid);
 
 do $$
