@@ -1,0 +1,9 @@
+# De service_role key en alles wat ermee gemaakt wordt blijft lokaal.
+.env
+.env.*
+!.env.example
+scripts/.env
+scripts/.generated-passwords.txt
+
+node_modules/
+.DS_Store

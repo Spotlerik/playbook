@@ -9,6 +9,10 @@ lead-routing reference, a **Use cases** explorer, and a **Demo Studio** slot.
 Imported from the Claude Design project *"# Playbook Coaching Hub"* and wired to
 run as a plain static site — no build step.
 
+De data zit sinds de Supabase-omschakeling **niet meer in de bundle**. De code is
+publiek, de gegevens staan achter een login in Supabase. Zie
+[Supabase](#supabase) hieronder.
+
 ## Run it locally
 
 It's a static site, so any static file server works:
@@ -18,8 +22,10 @@ python3 -m http.server 8000
 # then open http://localhost:8000/
 ```
 
-Open `/` (which serves `index.html`). Use the **NL / EN** buttons top-right to
-switch language and the **"Bekijken als" / "Viewing as"** dropdown to switch rep.
+Open `/` (which serves `index.html`). Je krijgt eerst het inlogscherm: zonder
+sessie laadt de app geen enkel gegeven. Na inloggen schakelen de **NL / EN**
+knoppen de taal. De **"Bekijken als" / "Viewing as"** keuze is
+managerfunctionaliteit — een rep ziet uitsluitend zichzelf.
 
 > Needs internet at runtime: React and the Lucide icon set load from unpkg, and
 > Open Sans loads from Google Fonts. Opening the file over `file://` will not
@@ -44,7 +50,13 @@ All asset paths are relative, so it also works from a project sub-path.
 | `index.html` | Servable entry point — the Coaching Hub (identical to `Coaching Hub.dc.html`). |
 | `Coaching Hub.dc.html` | Canonical design source in Claude "Design Compiler" format (`<x-dc>` template + logic). Kept for round-tripping with the design project. |
 | `support.js` | The Design Compiler runtime. Parses the `<x-dc>` template + logic and renders it with React (which it loads from unpkg). Auto-boots on `DOMContentLoaded`. |
-| `playbook-data.js` | Data layer. Exposes `listReps()` and `getViewerSnapshot(repId, period)` over a deterministically-generated representative dataset. Swap the body for a live HubSpot cut without touching anything upstream. |
+| `playbook-data.js` | Data layer. Exposes `listReps()` and `getViewerSnapshot(repId, period)` — dezelfde twee functies met dezelfde vormen als altijd. De namenlijst komt nu uit Supabase (`profiles`); de weekcijfers worden nog steeds representatief gegenereerd. Zodra HubSpot en Jiminny leveren verandert alleen de body van `getViewerSnapshot()`. |
+| `supabase-config.js` | **Enige plek met omgevingswaarden**: project-URL, anon key, cookiedomein, cookienaam. |
+| `supabase-client.js` | Gedeelde Supabase-client: cookie-storage, inloggen, uitloggen, profiel. Bedoeld om **letterlijk te kopiëren** naar de demo studio. |
+| `auth-gate.js` | Inlogscherm, sessieafhandeling en uitloggen. Vergrendelt de pagina tot er een sessie is. |
+| `supabase/migrations/` | Het schema, de RLS-policies, `get_shared_summary` en de referentiedata. Herhaalbaar. |
+| `supabase/tests/` | RLS-test, testset voor de gedeelde samenvatting, en de bewaartermijn-test. Draaien met `psql`; rollen zichzelf terug. |
+| `scripts/` | Beheerscripts (Node). Gebruikers aanmaken en RLS testen via de echte API. Heeft een eigen `package.json`; de site zelf heeft nog steeds geen buildstap. |
 | `_ds/spotler-design-system-…/` | The Spotler design system: CSS tokens (`tokens/*.css`), `styles.css`, and `_ds_bundle.js` (React components: Button, Card, Badge, Input, Select, Spotlight). |
 | `usecases/` | The Use Case Menu sub-app (plain React). `app.js` defines `window.UseCaseApp`; `use_cases.js` + `strings_nl.js` are its data + Dutch strings; `uc-mockups.js` is a Web Component that draws the illustration mockups. `index.html` is a standalone entry. |
 | `demo-studio/` | The interactive **Spotler Sales Tool** — a single self-contained bundle (`index.html`). Loaded in an iframe by the Coaching Hub's Demo Studio view and by the standalone `demo/` page. |
@@ -69,3 +81,421 @@ A few things were adapted so the project runs as a standalone static site:
 - **React / Lucide** — loaded from unpkg at runtime (React 18.3.1, Lucide
   latest), matching the design project. The standalone Use Case Menu page loads
   React from the same CDN rather than vendoring the minified copies.
+
+## Supabase
+
+Project **Spotler Playbook**, organisatie **Spotlerik**, regio Central EU
+(Frankfurt). Twee apps praten met deze database: het playbook en (straks) de
+demo studio.
+
+### Omgevingsvariabelen
+
+Er zijn er drie, en het onderscheid tussen de eerste twee en de derde is het
+hele beveiligingsmodel.
+
+| Naam | Waar hij hoort | Waarom |
+| --- | --- | --- |
+| `SUPABASE_URL` | `supabase-config.js` (in de repo) én `scripts/.env` | Geen geheim. |
+| `SUPABASE_ANON_KEY` | `supabase-config.js` (in de repo) én `scripts/.env` | **Mag publiek.** Hij geeft precies zoveel toegang als RLS toestaat en niet meer. Dat is een belofte die alleen klopt als de policies kloppen — zie *Volgorde* hieronder. |
+| `SUPABASE_SERVICE_ROLE_KEY` | **uitsluitend** `scripts/.env`, nooit in de repo, nooit in de frontend | Deze sleutel omzeilt RLS volledig. Hij is er alleen voor het aanmaken van gebruikers en het opruimen na een test. |
+
+`scripts/.env` en `scripts/.generated-passwords.txt` staan in `.gitignore`.
+
+```bash
+# scripts/.env
+SUPABASE_URL=https://<project>.supabase.co
+SUPABASE_ANON_KEY=<anon key>
+SUPABASE_SERVICE_ROLE_KEY=<service role key>
+```
+
+### Volgorde — dit is geen detail
+
+De anon key mag publiek zijn *omdat* RLS klopt. Dus:
+
+1. Migraties `0001` t/m `0004` draaien.
+2. `supabase/tests/rls.sql` groen.
+3. `supabase/tests/shared_summary.sql` groen.
+4. `supabase/tests/retention.sql` groen.
+5. `scripts/test-rls.mjs` groen (die test PostgREST + policies + anon key samen).
+6. **Pas dan** de anon key in `supabase-config.js` zetten, in een aparte commit.
+
+Een publieke key op nog niet bewezen policies is exact het lek dat we aan het
+dichten waren, maar dan met echte gegevens erin.
+
+### Migraties draaien
+
+Herhaalbaar: elke migratie is idempotent, dus je kunt RLS bijstellen en opnieuw
+draaien zonder het schema te laten vallen.
+
+```bash
+psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/0001_schema.sql
+psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/0002_rls.sql
+psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/0003_shared_summary.sql
+psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/0004_seed_reference_data.sql
+```
+
+Of plakken in de SQL-editor, in deze volgorde.
+
+**Projectinstellingen.** *Automatically expose new tables* staat UIT en
+*Enable automatic RLS* staat AAN. Nieuwe tabellen zijn dus niet vanzelf via de
+Data API bereikbaar. `0002_rls.sql` bevat daarom expliciete `GRANT`-regels; dat
+blok **is** de blootstellingslijst. Blootgesteld aan `authenticated`:
+`teams`, `profiles`, `prospects`, `demo_sessions`, `session_shares`,
+`trusted_domains`, `blocked_domains`, `rep_tool_configs`, `product_owners`,
+`app_settings`. Niet blootgesteld: `share_access_grants`,
+`share_access_attempts` — die zijn alleen bereikbaar via de functies in `0003`.
+Aan `anon`: geen enkele tabel, alleen drie RPC's.
+
+### De vier testsets draaien
+
+Draai deze **in deze volgorde**, tegen het echte project, voordat de anon key in
+de repo komt. Je hebt de connection string uit *Project Settings → Database*
+nodig; die bevat het databasewachtwoord, dus zet hem in je shell en niet in een
+bestand:
+
+```bash
+export SUPABASE_DB_URL='postgresql://postgres:<wachtwoord>@db.<project>.supabase.co:5432/postgres'
+```
+
+De drie SQL-sets rollen zichzelf terug: ze laten niets in de database achter,
+ook niet als ze slagen. Je kunt ze zo vaak draaien als je wilt.
+
+**1 — RLS op de tabellen**
+
+```bash
+psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -q -f supabase/tests/rls.sql
+```
+
+Goed als je precies dit ziet, en verder niets:
+
+```
+NOTICE:  RLS-test geslaagd — alle verboden acties zijn geweigerd.
+```
+
+**2 — de gedeelde samenvatting**
+
+```bash
+psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -q -f supabase/tests/shared_summary.sql
+```
+
+```
+NOTICE:  get_shared_summary-testset geslaagd.
+```
+
+**3 — de bewaartermijn**
+
+```bash
+psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -q -f supabase/tests/retention.sql
+```
+
+```
+NOTICE:  Bewaartermijn-test geslaagd.
+```
+
+**4 — de echte API, met de publieke anon key**
+
+Deze test hoort er apart bij: de eerste drie testen de policies ín de database,
+deze test of PostgREST, de policies en de anon key *samen* dichtzitten. Dat is de
+combinatie die straks in de browser draait.
+
+```bash
+cd scripts
+npm install
+SUPABASE_URL=... SUPABASE_ANON_KEY=... SUPABASE_SERVICE_ROLE_KEY=... npm run test-rls
+```
+
+Je krijgt een regel per controle. Goed als de laatste twee regels zijn:
+
+```
+0 gefaald.
+Alles dicht. De anon key mag naar de frontend.
+```
+
+Het script maakt drie eigen testaccounts aan (`rls-test-…@example.test`), logt
+daarmee écht in met de anon key, en ruimt ze aan het eind weer op. De veertien
+echte accounts worden niet aangeraakt. De `service_role` key wordt alleen
+gebruikt voor dat aanmaken en opruimen, nooit voor een controle zelf.
+
+**Wat "fout" eruitziet.** Elke gefaalde controle begint met `FAIL —` en zegt
+precies wat er wél kon terwijl het niet mocht, bijvoorbeeld:
+
+```
+ERROR:  FAIL — rep A leest sessie van rep B : 1 rij(en) zichtbaar/geraakt, verwacht 0
+```
+
+Bij een `FAIL` stopt de SQL-set direct en rolt hij terug; `test-rls.mjs` draait
+door en somt aan het eind alles op met exit code 1. In beide gevallen: **niet de
+anon key plaatsen.** Repareer de policy in `0002_rls.sql`, draai die migratie
+opnieuw (hij is idempotent) en draai de test opnieuw.
+
+**Deze tests zijn zelf getest.** Ze zijn gecontroleerd door de policies
+opzettelijk te slopen — een `using (true)` op `demo_sessions`, de
+rolwijziging-trigger eraf, `anon` leestoegang op `profiles`, de harde uitsluiting
+van interne notities en van de prijsindicatie eruit, de `revoked_at`-controle
+eruit, en de bewaartermijn hardcoded in plaats van uit `app_settings`. Alle
+zeven werden betrapt met een `FAIL`, en na herstel was alles weer groen. Een test
+die niets kan detecteren is geen test.
+
+### Waar het echte project kan afwijken van de lokale controle
+
+Alles in deze repo is vóór oplevering gedraaid tegen een lokale PostgreSQL 16
+met een **handgebouwde nabootsing** van een leeg Supabase-project: het
+`auth`-schema, `auth.uid()`, en de rollen `anon` / `authenticated` /
+`service_role`. Dat vangt veel, maar niet alles. Hieronder staat waar de twee
+omgevingen uit elkaar kunnen lopen, zodat je weet waar je op moet letten en
+welke fouten *niets* over je policies zeggen.
+
+**Verbind met de directe connectie, niet met de pooler.** De SQL-testsets
+gebruiken tijdelijke tabellen, `set_config()` en `reset role`. Dat vraagt een
+sessie, en de transaction-mode pooler (poort **6543**) geeft je die niet
+betrouwbaar. Neem de connection string op poort **5432** uit *Project Settings →
+Database*. Krijg je onverklaarbare fouten over ontbrekende temp-tabellen of een
+rol die niet terugschakelt, dan is dit vrijwel zeker de oorzaak.
+
+**Draai alle vier de migraties als dezelfde rol.** SECURITY DEFINER functies
+draaien als hun eigenaar, en die eigenaar is de rol die de migratie uitvoerde.
+`is_manager()` en de `owns_*()`-functies leunen erop dat die eigenaar de tabellen
+bezit en dus RLS overslaat. Migraties half als `postgres` en half via een ander
+kanaal draaien geeft moeilijk te vinden gedrag. Gebruik voor alles de SQL-editor,
+of voor alles psql als `postgres`.
+
+**Wat de lokale controle NIET kon testen — en wat dat betekent:**
+
+| Verschil | Waar het misgaat, en wat je dan ziet |
+| --- | --- |
+| **PostgREST bestaat lokaal niet.** De drie SQL-sets praten rechtstreeks met de database. Ze zeggen dus niets over de HTTP-laag: de schema-cache, hoe grants op endpoints worden afgebeeld, embedded queries (`select=*,prospects(*)`), en het `authenticator` → `SET ROLE`-mechanisme. | Dit is het grootste gat. `scripts/test-rls.mjs` dekt precies dit, en is als enige van de vier **nog nooit tegen een echte omgeving gedraaid**. Als er ergens een verrassing zit, zit hij daar. Draai die set dus echt, en niet alleen de drie SQL-sets. |
+| **Schema-cache van PostgREST.** Na een migratie kent de API een nieuwe tabel niet meteen. | Een `PGRST205` / "Could not find the table in the schema cache" vlak na het migreren. Wacht een paar seconden of draai `notify pgrst, 'reload schema';`, en probeer opnieuw voordat je gaat debuggen. Geen policy-probleem. |
+| **JWT-claims.** Lokaal is alleen `sub` en `role` gezet; een echte Supabase-JWT bevat ook `aud`, `exp`, `email`, `app_metadata`, `session_id`, `aal`, `amr`. `auth.uid()` leest alleen `sub`, dus het hoort identiek te werken. | Zou het tóch afwijken, dan zie je dat in `test-rls.mjs` (die gebruikt echte JWT's) en niet in de SQL-sets. Symptoom: een rep ziet nul eigen rijen omdat `auth.uid()` null teruggeeft. |
+| **`auth.users` is echt.** De lokale stub heeft elf kolommen; de echte tabel heeft er ruim dertig, met eigen triggers, en is eigendom van `supabase_auth_admin`. De SQL-sets schrijven er rechtstreeks in omdat `profiles` er met een foreign key naar verwijst. | Elke SQL-set begint nu met een **preflight** die dit vooraf probeert. Faalt het, dan krijg je een expliciete melding dat dit de testopstelling is en niet je beveiliging, met de verwijzing naar `test-rls.mjs` — dat script maakt zijn gebruikers via de ondersteunde Admin API. |
+| **`postgres` is op Supabase geen superuser.** Lokaal wel. | Relevant voor `create extension` en `create schema` in `0001`. Op Supabase bestaat `extensions` al en is pgcrypto al geïnstalleerd, dus beide regels zijn no-ops. Krijg je hier toch een rechtenfout, laat het weten voordat je verder gaat. |
+| **pgcrypto staat op Supabase in het schema `extensions`, niet in `public`.** | Dit *was* een echte fout: `0003` klapte er volledig uit met `function gen_random_bytes(integer) does not exist`. Opgelost door `extensions` in het `search_path` van elke functie te pinnen, en daarna geverifieerd tegen beide indelingen. Vermeld hier zodat niemand dat pad later "opschoont" en de fout terugzet. |
+
+**Wat de testruns achterlaten.** De drie SQL-sets rollen zichzelf volledig terug.
+`test-rls.mjs` ruimt zijn accounts, sessies en shares op, maar laat twee rijen
+achter in `share_access_attempts` — dat is de rate-limit log en die bevat alleen
+een hash. Onschadelijk; opruimen mag maar hoeft niet.
+
+**Als iets afwijkt van wat hier staat, is dat interessant.** Vooral bij
+`test-rls.mjs`: als daar een controle faalt die lokaal slaagde, dan doet de
+HTTP-laag iets anders dan de database — en dat wil je weten vóór er data in gaat,
+niet erna.
+
+### Een gebruiker toevoegen
+
+1. Zet de persoon in `scripts/roster.mjs` (naam, e-mail in kleine letters, rol
+   `rep` of `manager`).
+2. `cd scripts && node create-users.mjs`
+
+Het script is idempotent: bestaande accounts worden hergebruikt en alleen hun
+profiel bijgewerkt, nieuwe krijgen een tijdelijk wachtwoord dat in
+`scripts/.generated-passwords.txt` belandt (gitignored). Deel dat zelf en
+verwijder het bestand daarna.
+
+**Er gaat geen enkele mail uit.** Dat is de reden dat het script bestaat:
+`admin.createUser({ email_confirm: true })` verstuurt niets, terwijl
+`inviteUserByEmail()`, `generateLink()` en `signUp()` dat wél doen. Alleen de
+eerste komt in het script voor. Heb je het account al met de hand in het
+dashboard aangemaakt (met *Auto Confirm User*), draai het script dan alsnog: het
+vindt het bestaande account en maakt de ontbrekende `profiles`-rij aan.
+
+"Wachtwoord vergeten" in het inlogscherm werkt wel — dat is een handeling van de
+gebruiker zelf, geen automatische mail bij het aanmaken.
+
+### Waar het cookiedomein staat
+
+Eén constante: `COOKIE_DOMAIN` in **`supabase-config.js`**.
+
+```js
+export const COOKIE_DOMAIN = null;          // nu: host-only
+// export const COOKIE_DOMAIN = '.spotler.com';  // straks
+```
+
+Het playbook komt op `playbook.spotler.com` en de demo studio op
+`demo.spotler.com`. Dat zijn verschillende origins, dus de standaard
+localStorage-sessie wordt niet gedeeld. `supabase-client.js` geeft daarom een
+eigen storage-adapter mee aan `createClient()` die de sessie in een cookie zet
+(gesplitst over `naam.0`, `naam.1`, … omdat een sessie groter is dan de 4 KB per
+cookie die browsers toestaan). Zodra DNS geregeld is, is het invullen van deze
+ene constante de enige wijziging.
+
+> **`github.io` staat op de Public Suffix List.** Browsers weigeren daar per
+> definitie een cookie op `.github.io` — dat zou elke GitHub Pages-site toegang
+> geven tot elkaars cookies. Op `spotlerik.github.io` blijft de sessie dus
+> host-only, hoe je `COOKIE_DOMAIN` ook zet. Dat is geen bug en het lost zichzelf
+> op zodra de site op een eigen domein staat. `supabase-client.js` waarschuwt in
+> de console als de ingestelde waarde niet bij de huidige host past, in plaats
+> van je stilzwijgend uit te loggen.
+
+### Wat de demo studio moet overnemen
+
+De demo studio komt in een aparte repo en een aparte bouwsessie, op dezelfde
+database. Neem daar **ongewijzigd** over:
+
+- `supabase-config.js` — inclusief dezelfde `STORAGE_KEY` en dezelfde
+  `COOKIE_DOMAIN`. Wijken die af, dan deelt het cookiedomein wel de cookie maar
+  leest de andere app hem niet, en logt de ene app de andere effectief uit.
+- `supabase-client.js` — de client, de cookie-storage en de sessiefuncties.
+
+Bouw daar geen tweede versie naast. Wat de demo studio er zelf bij bouwt is het
+lezen en schrijven van `demo_sessions`, `prospects` en `session_shares`; het
+schema en de RLS daarvoor staan er al.
+
+Twee afspraken die het schema aan beide apps oplegt:
+
+- `demo_sessions.state` bevat een object onder de sleutel `blocks`, met per
+  samenvattingsblok één sleutel. `session_shares.included_blocks` is een array
+  van diezelfde sleutels.
+- Blokken uit `never_shareable_blocks()` (`internal_notes`, `rep_notes`,
+  `coaching_notes`, `internal`, `pricing`) komen er nooit uit — niet als
+  instelling maar als harde uitsluiting, afgedwongen bij het schrijven én bij het
+  lezen. Bouw in de demo studio dus geen schakelaar voor deze blokken: de
+  database weigert ze hoe dan ook.
+
+### Wat wel en niet deelbaar is
+
+De rep kiest per keer welke blokken mee mogen en kan de link op elk moment
+uitzetten (`revoked_at` vullen). Vervaldatum standaard 90 dagen, in te stellen
+per share.
+
+Twee categorieën blokken zijn **structureel niet deelbaar**, en dat is een harde
+uitsluiting in `never_shareable_blocks()` — geen standaardinstelling die iemand
+kan omzetten:
+
+- **Interne notities van de rep** (`internal_notes`, `rep_notes`,
+  `coaching_notes`, `internal`). Nooit, op geen enkele manier.
+- **Prijsindicatie** (`pricing`). Dit was eerst "standaard uit, de rep mag hem
+  aanzetten". Dat is bewust strenger gemaakt: standaard-uit betekent dat één
+  verkeerde klik genoeg is, en een prijs in een URL die blijft bestaan en
+  doorgestuurd kan worden hoort er niet. Wil een rep een prijs delen, dan stuurt
+  hij een offerte.
+
+De uitsluiting geldt op drie plekken, zodat er geen achterdeur is: bij
+`create_session_share()`, bij elke `insert`/`update` op `session_shares` (de
+write-trigger schrijft de blokken eruit), en nog een keer bij het lezen in
+`get_shared_summary()`. Wijzigen kan alleen via een migratie op
+`never_shareable_blocks()` — dat staat dan in de geschiedenis, in plaats van in
+een rij die iemand stilletjes leeg maakt.
+
+### Bewaartermijn
+
+**Aanname, geen beleid.** 24 maanden na afsluiting van de sessie worden
+contactnaam en e-mailadres in `prospects` gewist; de sessiedata blijft bestaan,
+dan zonder herleidbare persoon. Spotler heeft vrijwel zeker al een bewaartermijn
+voor prospectgegevens in HubSpot; die moet deze overschrijven zodra hij bekend
+is. Daarom staat de termijn op precies één plek:
+
+```sql
+update public.app_settings set value = '12'::jsonb
+ where key = 'prospect_retention_months';
+```
+
+Meer is er niet te wijzigen — `supabase/tests/retention.sql` bewaakt dat
+expliciet. Het opschonen zelf draait via
+`select public.anonymize_expired_prospects();`, in te plannen als terugkerende
+taak onder `service_role`.
+
+### Nog niet gebouwd
+
+Dit fundament levert het schema, de rechten en de login. Wat er bewust nog niet
+is, en waar de volgende sessies over gaan:
+
+- **De samenvattingspagina** (route `/s/`) en de mailer die het toegangstoken
+  verstuurt. De database-kant staat er wel: `get_share_gate()`,
+  `request_shared_summary_access()` en `get_shared_summary()` werken en zijn
+  getest. De Edge Function die de toegangsmail stuurt kijkt naar
+  `share_access_grants.notified_at is null`.
+- **Het opslaan van demo-sessies** vanuit de demo studio.
+- **De live HubSpot- en Jiminny-cijfers.** Tot die er zijn genereert
+  `getViewerSnapshot()` representatieve weekcijfers, zoals voorheen.
+
+### Openstaand
+
+Bewust nog niet gedaan, met de reden erbij, zodat het niet stilletjes verdwijnt.
+
+- **De oude rep-dataset staat nog in de git-geschiedenis.** Uit de bundle is hij
+  weg, maar `git log` heeft de commits met de veertien voornamen en hun
+  scores nog. Bewust niet herschreven: een force-push op een publieke repo breekt
+  clones en forks, en de oude objecten blijven vaak alsnog bestaan in caches en
+  in forks die al gemaakt zijn — je haalt het er dus niet echt uit en je breekt
+  wel iets. **Opgelost bij de verhuizing naar `playbook.spotler.com`:** als daar
+  een nieuwe repo wordt aangemaakt, begint de geschiedenis schoon. Neem dit mee
+  op het moment dat die verhuizing wordt ingepland.
+- **De sessie wordt nog niet gedeeld tussen subdomeinen.** `COOKIE_DOMAIN` staat
+  op `null` omdat DNS er nog niet is, en op `github.io` kan het sowieso niet
+  (Public Suffix List). Eén constante omzetten zodra `playbook.spotler.com` en
+  `demo.spotler.com` bestaan.
+- **`robots.txt` doet nog niets.** Een GitHub Pages *project*-site serveert
+  robots.txt alleen vanaf de domeinroot, en die hoort bij de user-site. Het
+  bestand staat er alvast klaar voor de verhuizing; de `noindex`-tag op de
+  samenvattingspagina zelf komt bij de bouw van die pagina.
+- **`/demo/` staat nog buiten de login.** Die standalone pagina toont de demo
+  studio-bundel zonder sessie. Dat lekt op dit moment niets — de tool bewaart
+  alles in localStorage en praat nog niet met Supabase — maar zodra de demo
+  studio sessies gaat opslaan, moet die pagina achter dezelfde auth-gate.
+  Volledige overdracht hieronder.
+
+#### Overdracht: `/demo/` achter de login (aparte sessie)
+
+Deze paragraaf is geschreven voor iemand die de bouw van het fundament niet
+heeft meegemaakt. Alles wat je nodig hebt staat hier of in de bestanden die
+hier genoemd worden.
+
+**Neem deze twee bestanden letterlijk over. Niet nabouwen, niet aanpassen:**
+
+| Bestand | Wat het doet | Wat er absoluut hetzelfde moet blijven |
+| --- | --- | --- |
+| `supabase-config.js` | Project-URL, anon key, cookiedomein, cookienaam. | `STORAGE_KEY` en `COOKIE_DOMAIN`. Wijkt één van die twee af, dan schrijven de twee apps hun sessie in verschillende cookies en logt de ene de andere effectief uit. Het symptoom is "ik moet steeds opnieuw inloggen", en dat is lastig te herleiden. |
+| `supabase-client.js` | De Supabase-client, de cookie-storage (inclusief het splitsen over `naam.0`, `naam.1`, … omdat een sessie groter is dan 4 KB), en `signIn` / `signOut` / `getSession` / `getMyProfile`. | Alles. Ook de chunkgrootte (3180) en de cookie-attributen. |
+
+`auth-gate.js` is *niet* zo'n bestand: dat is de playbook-schil (overlay,
+Nederlandse teksten, het verbergen van `<x-dc>`). Bouw voor de demo studio een
+eigen gate in de stijl van die app, maar laat hem dezelfde vier functies uit
+`supabase-client.js` gebruiken en dezelfde volgorde aanhouden:
+
+1. Vergrendel de pagina vóór de app boot.
+2. `getSession()` — geen sessie? Toon het inlogscherm.
+3. `getMyProfile()` — geen profielrij? Log uit en weiger toegang. Een geldig
+   auth-account zonder profiel heeft geen naam, geen rol en geen team; daar kan
+   de app niets mee.
+4. Pas daarna de app laten laden en de eerste query doen.
+
+In het playbook is stap 4 opgelost met een top-level `await` in
+`playbook-data.js` op een promise die de gate zet. Dat is één manier; het gaat
+erom dat er geen query vertrekt voordat stap 3 klaar is.
+
+**Schema-afspraken waar de demo studio zich aan moet houden**
+
+Het schema en de RLS voor `demo_sessions`, `prospects` en `session_shares`
+staan er al. Wat de demo studio bouwt is het lezen en schrijven ervan. Vier
+afspraken, allemaal afgedwongen in de database:
+
+1. **`demo_sessions.state` bevat een object onder de sleutel `blocks`**, met per
+   samenvattingsblok één sleutel. `session_shares.included_blocks` is een array
+   van diezelfde sleutels. `get_shared_summary()` leest `state -> 'blocks' -> <sleutel>`
+   voor elk vrijgegeven blok; sleutels die niet in `blocks` staan komen simpelweg
+   niet in het antwoord.
+2. **Blokken uit `never_shareable_blocks()` zijn nooit deelbaar**: momenteel
+   `internal_notes`, `rep_notes`, `coaching_notes`, `internal` en `pricing`.
+   Bouw hier geen schakelaar voor — de database filtert ze eruit bij het
+   aanmaken, bij elke schrijfactie en nog een keer bij het lezen. Een
+   UI-schakelaar zou dus een knop zijn die niets doet.
+3. **Maak shares via `create_session_share(session_id, included_blocks, expiry_days)`**,
+   niet met een directe `insert`. Die functie leidt `allowed_domain` af uit het
+   e-mailadres van het contactpersoon en laat het leeg als dat een publiek of
+   eigen domein is. Doe je dat zelf, dan mis je die regel.
+4. **Adressen toevoegen en verwijderen gaat via `add_share_email(share_id, email)`
+   en `remove_share_email(share_id, email)`**, niet via een `update` op
+   `allowed_emails`. Daar zit de validatie (geldig adres, geen wegwerpadres) en
+   het intrekken van lopende toegang in.
+
+**Twee dingen om te weten over de rechten**
+
+- Een rep heeft volledige rechten op zijn eigen `demo_sessions` (`rep_id = auth.uid()`)
+  en leest niets van een ander. Een manager leest alles maar schrijft niets van
+  een ander. Zet `rep_id` dus altijd op `auth.uid()`; een insert op naam van
+  iemand anders wordt geweigerd.
+- Een prospect wordt aangemaakt vóór de sessie die ernaar verwijst. Daarom is
+  `prospects.created_by` er, met `default auth.uid()`. Laat die default staan.
+
+**Als je klaar bent**, zet `/demo/` en `demo-studio/index.html` achter de gate en
+haal het `Openstaand`-punt hierboven weg.

@@ -6,6 +6,8 @@
 <title>Spotler Playbook</title>
 <link rel="icon" type="image/svg+xml" href="assets/spotlight-yellow.svg">
 <script src="./support.js"></script>
+<!-- Vergrendelt de pagina tot er een sessie is. Moet vóór de app laden. -->
+<script type="module" src="./auth-gate.js"></script>
 </head>
 <body>
 <x-dc>
@@ -101,14 +103,16 @@
     </sc-if>
 
     <div style="margin-top:auto; border-top:1px solid rgba(255,255,255,0.14); padding:var(--space-3); display:flex; align-items:center; gap:10px; min-width:0;">
-      <div style="width:30px; height:30px; border-radius:50%; background:var(--cyan); color:var(--navy); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; font-family:var(--font-display); flex-shrink:0;">{{ viewerInitials }}</div>
+      <div style="width:30px; height:30px; border-radius:50%; background:var(--cyan); color:var(--navy); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; font-family:var(--font-display); flex-shrink:0;">{{ accountInitials }}</div>
       <sc-if value="{{ sidebarExpanded }}" hint-placeholder-val="{{ true }}">
         <div style="min-width:0; flex:1;">
-          <div style="font-size:12.5px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ viewerName }}</div>
-          <div style="font-size:10.5px; color:rgba(255,255,255,0.55);">{{ t_repRole }}</div>
+          <div style="font-size:12.5px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ accountName }}</div>
+          <div style="font-size:10.5px; color:rgba(255,255,255,0.55);">{{ accountRoleLabel }}</div>
         </div>
       </sc-if>
-      <span ref="{{ powerIconRef }}" style="display:inline-flex; width:15px; height:15px; color:rgba(255,255,255,0.5); flex-shrink:0;"></span>
+      <button onClick="{{ onSignOut }}" title="{{ t_signOut }}" aria-label="{{ t_signOut }}" style-hover="background:rgba(255,255,255,0.14);" style="border:none; background:transparent; padding:6px; border-radius:var(--radius-md); cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background var(--dur) var(--ease-out);">
+        <span ref="{{ powerIconRef }}" style="display:inline-flex; width:15px; height:15px; color:rgba(255,255,255,0.5);"></span>
+      </button>
     </div>
   </div>
 
@@ -738,6 +742,8 @@ const I18N = {
     navDemoStudio: 'Demo Studio',
     navHelp: 'Help',
     repRole: 'Rep',
+    managerRole: 'Manager',
+    signOut: 'Uitloggen',
     toolkitTitle: 'Toolkit',
     toolkitSub: 'Alles wat je nodig hebt, geordend per funnelfase.',
     searchPlaceholder: 'Zoeken...',
@@ -753,13 +759,13 @@ const I18N = {
     closedLostReasons: ['Competition', 'Price', 'No fit', 'Features', 'On Hold', 'Unreachable', 'Unknown'],
     closedLostNote: "De reden is verplicht bij het sluiten als Closed Lost. Bij Competition geef je aan welke concurrent het is. 25% van verlies staat op 'On Hold' — overweeg een herijkingscadans van 90 tot 180 dagen.",
     contactsTitle: 'Wie kun je bereiken',
-    owner: { name: 'Glenn', role: 'Eigenaar van het playbook · Chief Revenue Officer', desc: 'Glenn is eindverantwoordelijk voor de inhoud, structuur en strategische keuzes in dit playbook, inclusief de toewijzingslogica, producteigenaarschap en prioritering van actiepunten.' },
+    owner: { name: 'Playbook-eigenaar', role: 'Eigenaar van het playbook · Chief Revenue Officer', desc: 'Eindverantwoordelijk voor de inhoud, structuur en strategische keuzes in dit playbook, inclusief de toewijzingslogica, producteigenaarschap en prioritering van actiepunten.' },
     contacts: [
-      { name: 'Manuela Crielaard', desc: 'Aanspreekpunt voor vragen, opmerkingen of aanpassingen op het playbook.' },
-      { name: 'Sjoerd de Jong', desc: 'Aanspreekpunt voor vragen, opmerkingen of aanpassingen op het playbook.' },
-      { name: 'Robbert Brouwer', desc: 'Aanspreekpunt voor vragen, opmerkingen of aanpassingen op het playbook.' },
+      { name: 'Mail+ contactpersoon', desc: 'Aanspreekpunt voor vragen, opmerkingen of aanpassingen op het playbook.' },
+      { name: 'Activate contactpersoon', desc: 'Aanspreekpunt voor vragen, opmerkingen of aanpassingen op het playbook.' },
+      { name: 'FeedbackPro contactpersoon', desc: 'Aanspreekpunt voor vragen, opmerkingen of aanpassingen op het playbook.' },
     ],
-    contactsFooter: 'Heb je een correctie, aanvulling of zie je iets dat niet meer klopt? Neem contact op met Manuela, Sjoerd of Robbert. Zij verzamelen feedback en stemmen wijzigingen af met Glenn.',
+    contactsFooter: 'Heb je een correctie, aanvulling of zie je iets dat niet meer klopt? Neem contact op met een van de contactpersonen hierboven. Zij verzamelen feedback en stemmen wijzigingen af met de playbook-eigenaar.',
     tableProduct: 'Product', tableDesc: 'Beschrijving', tableNb: 'NB mediaan MRR', tableEb: 'EB mediaan MRR-change', tableType: 'Type',
     stageQualified: 'Gekwalificeerd',
     stageDemo: 'Demo',
@@ -910,14 +916,14 @@ const I18N = {
             { product: 'CRM', desc: 'CRM-module', nb: '€75', eb: '€48', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'transparent' },
             { product: 'Engage', desc: 'Marketing automation / engagement', nb: '€350', eb: '€200', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'transparent' },
             { product: 'Mail+', desc: 'E-mail marketing automation · grootste klantbasis', nb: '€220', eb: '€164', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'var(--cyan-tint)' },
-            { product: 'Mail Pro', desc: 'E-mail · Pro-tier', nb: '€150', eb: '€150', typeLabel: 'NB + XS · Jasper Koenraad', typeTone: 'neutral', rowBg: 'transparent' },
+            { product: 'Mail Pro', desc: 'E-mail · Pro-tier', nb: '€150', eb: '€150', typeLabel: 'NB + XS · MailPro-eigenaar', typeTone: 'neutral', rowBg: 'transparent' },
             { product: 'Send Pro', desc: 'Transactional e-mail · NB & XS', nb: '€299', eb: '€256', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'transparent' },
             { product: 'Spotler FeedbackPro', desc: 'Customer feedback · geavanceerd', nb: '€250', eb: '€188', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'var(--cyan-tint)' },
             { product: 'Spotler Feedback', desc: 'Customer feedback · basis', nb: '€100', eb: '€100', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'transparent' },
             { product: 'Activate Search', desc: 'Onsite search · add-on bij Activate', nb: '€157', eb: '€125', typeLabel: 'Add-on', typeTone: 'neutral', rowBg: 'transparent' },
             { product: 'Aigent', desc: 'AI-agent / conversational', nb: '€240', eb: '€240', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'transparent' },
             { product: 'Eazy', desc: 'E-mailmarketing · eenvoudig segment', nb: '€227', eb: '€175', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'transparent' },
-            { product: 'Momice', desc: 'Event management platform', nb: '€258', eb: '€204', typeLabel: 'Jasper Werkman', typeTone: 'neutral', rowBg: 'transparent' },
+            { product: 'Momice', desc: 'Event management platform', nb: '€258', eb: '€204', typeLabel: 'Momice-eigenaar', typeTone: 'neutral', rowBg: 'transparent' },
           ] },
         { isTable: false, isScript: true,
           title: 'Closing scripts · vervolgstap-discipline',
@@ -959,6 +965,8 @@ const I18N = {
     navDemoStudio: 'Demo Studio',
     navHelp: 'Help',
     repRole: 'Rep',
+    managerRole: 'Manager',
+    signOut: 'Sign out',
     toolkitTitle: 'Toolkit',
     toolkitSub: 'Everything you need, organised by funnel stage.',
     searchPlaceholder: 'Search...',
@@ -974,13 +982,13 @@ const I18N = {
     closedLostReasons: ['Competition', 'Price', 'No fit', 'Features', 'On Hold', 'Unreachable', 'Unknown'],
     closedLostNote: "The reason is mandatory when closing a deal as Closed Lost. For Competition, name the competitor. 25% is On Hold — consider a 90-180 day recheck cadence.",
     contactsTitle: 'Who to contact',
-    owner: { name: 'Glenn', role: 'Playbook owner · Chief Revenue Officer', desc: 'Glenn holds final responsibility for the content, structure and strategic choices in this playbook, including the assignment logic, product ownership and prioritisation of action points.' },
+    owner: { name: 'Playbook owner', role: 'Playbook owner · Chief Revenue Officer', desc: 'Holds final responsibility for the content, structure and strategic choices in this playbook, including the assignment logic, product ownership and prioritisation of action points.' },
     contacts: [
-      { name: 'Manuela Crielaard', desc: 'Point of contact for questions, comments or changes to the playbook.' },
-      { name: 'Sjoerd de Jong', desc: 'Point of contact for questions, comments or changes to the playbook.' },
-      { name: 'Robbert Brouwer', desc: 'Point of contact for questions, comments or changes to the playbook.' },
+      { name: 'Mail+ contact', desc: 'Point of contact for questions, comments or changes to the playbook.' },
+      { name: 'Activate contact', desc: 'Point of contact for questions, comments or changes to the playbook.' },
+      { name: 'FeedbackPro contact', desc: 'Point of contact for questions, comments or changes to the playbook.' },
     ],
-    contactsFooter: 'Spotted a correction or addition, or something that is no longer accurate? Contact Manuela, Sjoerd or Robbert. They collect feedback and align changes with Glenn.',
+    contactsFooter: 'Spotted a correction or addition, or something that is no longer accurate? Contact one of the people listed above. They collect feedback and align changes with the playbook owner.',
     tableProduct: 'Product', tableDesc: 'Description', tableNb: 'NB median MRR', tableEb: 'EB median MRR change', tableType: 'Type',
     stageQualified: 'Qualified',
     stageDemo: 'Demo',
@@ -1128,14 +1136,14 @@ const I18N = {
             { product: 'CRM', desc: 'CRM module', nb: '€75', eb: '€48', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'transparent' },
             { product: 'Engage', desc: 'Marketing automation / engagement', nb: '€350', eb: '€200', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'transparent' },
             { product: 'Mail+', desc: 'Email marketing automation · largest customer base', nb: '€220', eb: '€164', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'var(--cyan-tint)' },
-            { product: 'Mail Pro', desc: 'Email · Pro tier', nb: '€150', eb: '€150', typeLabel: 'NB + XS · Jasper Koenraad', typeTone: 'neutral', rowBg: 'transparent' },
+            { product: 'Mail Pro', desc: 'Email · Pro tier', nb: '€150', eb: '€150', typeLabel: 'NB + XS · MailPro owner', typeTone: 'neutral', rowBg: 'transparent' },
             { product: 'Send Pro', desc: 'Transactional email · NB & XS', nb: '€299', eb: '€256', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'transparent' },
             { product: 'Spotler FeedbackPro', desc: 'Customer feedback · advanced', nb: '€250', eb: '€188', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'var(--cyan-tint)' },
             { product: 'Spotler Feedback', desc: 'Customer feedback · basic', nb: '€100', eb: '€100', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'transparent' },
             { product: 'Activate Search', desc: 'Onsite search · add-on to Activate', nb: '€157', eb: '€125', typeLabel: 'Add-on', typeTone: 'neutral', rowBg: 'transparent' },
             { product: 'Aigent', desc: 'AI agent / conversational', nb: '€240', eb: '€240', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'transparent' },
             { product: 'Eazy', desc: 'Email marketing · simple segment', nb: '€227', eb: '€175', typeLabel: 'NB + XS', typeTone: 'neutral', rowBg: 'transparent' },
-            { product: 'Momice', desc: 'Event management platform', nb: '€258', eb: '€204', typeLabel: 'Jasper Werkman', typeTone: 'neutral', rowBg: 'transparent' },
+            { product: 'Momice', desc: 'Event management platform', nb: '€258', eb: '€204', typeLabel: 'Momice owner', typeTone: 'neutral', rowBg: 'transparent' },
           ] },
         { isTable: false, isScript: true,
           title: 'Closing scripts · next-step discipline',
@@ -1164,23 +1172,12 @@ function formatDate(iso, lang) {
 function targetLabel(lang, count, target, periodWord) {
   return lang === 'nl' ? `${count} van ${target} doel ${periodWord}` : `${count} of ${target} target ${periodWord}`;
 }
-const OWNER_ROWS = [
-  { product: 'Activate', owner: 'Sjoerd de Jong, Rick Dekker', hasOwner: true },
-  { product: 'Commerce Cloud', owner: 'Boris Mileusnic', hasOwner: true },
-  { product: 'Mail+', owner: 'Manuela Crielaard, Marthijn Dam Wichers, Sander te Loo', hasOwner: true },
-  { product: 'MailPro', owner: 'Jasper Koenraad', hasOwner: true },
-  { product: 'CRM', owner: 'Marthijn Dam Wichers', hasOwner: true },
-  { product: 'SendPro', owner: 'Nick van Dijk · Manuela Crielaard', hasOwner: true },
-  { product: 'Message', owner: 'Boris Mileusnic', hasOwner: true },
-  { product: 'FeedbackPro', owner: 'Ivo Klein, Robbert Brouwer', hasOwner: true },
-  { product: 'Search', owner: 'Rick Dekker', hasOwner: true },
-  { product: 'Engage + Chat+', owner: 'Harry', hasOwner: true },
-  { product: 'Momice', owner: 'Jasper Werkman', hasOwner: true },
-  { product: 'BrandID', owner: '', hasOwner: false },
-];
+// De producteigenaren komen uit Supabase (product_owners), niet meer uit de
+// bundle: het waren echte namen in een publieke repo, hetzelfde probleem als de
+// rep-dataset die hier ook uit is gehaald.
 
 class Component extends DCLogic {
-  state = { lang: 'nl', viewerId: 'ivo', period: 'week', activePanelId: null, view: 'home', activeStage: null, toolkitExpanded: false, sidebarCollapsed: false, demoStudioFullscreen: false, expandedProtocolId: null };
+  state = { lang: 'nl', viewerId: null, period: 'week', activePanelId: null, view: 'home', activeStage: null, toolkitExpanded: false, sidebarCollapsed: false, demoStudioFullscreen: false, expandedProtocolId: null };
 
   componentDidMount() {
     import('./playbook-data.js').then((mod) => {
@@ -1298,7 +1295,7 @@ class Component extends DCLogic {
     const goStage = (stageId) => this.setState({ view: 'stage', activeStage: stageId, toolkitExpanded: true });
     const toneColors = { success: 'var(--success)', warning: 'var(--warning)', danger: 'var(--danger)', info: 'var(--cyan-shade)' };
     const pipelineHealth = T.pipelineHealth.map((p) => ({ label: p.label, value: p.value, sub: p.sub, color: toneColors[p.tone] || 'var(--fg2)', iconRef: this.getIconRef(p.icon, 15), trendIconRef: this.getIconRef(p.trendIcon, 12), trendLabel: p.trendLabel, prompt: p.prompt }));
-    const ownerRows = OWNER_ROWS.map((r, i) => ({ product: r.product, owner: r.owner, hasOwner: r.hasOwner, noOwner: !r.hasOwner, rowBg: i % 2 === 1 ? 'var(--cyan-tint)' : 'transparent' }));
+    const ownerRows = (mod ? mod.listProductOwners() : []).map((r, i) => ({ product: r.product, owner: r.owner, hasOwner: r.hasOwner, noOwner: !r.hasOwner, rowBg: i % 2 === 1 ? 'var(--cyan-tint)' : 'transparent' }));
 
     if (!mod) {
       return {
@@ -1308,6 +1305,8 @@ class Component extends DCLogic {
         t_panelsTitle: T.panelsTitle, t_hoverHint: T.hoverHint, t_teamAvg: T.teamAvg,
         t_leaderboardTitle: T.leaderboardTitle, t_leaderboardFooter: T.leaderboardFooter, t_help: T.navHelp,
         viewingAsLabel: T.viewingAs, viewerId: this.state.viewerId,
+        accountName: '', accountInitials: '', accountRoleLabel: '', t_signOut: T.signOut,
+        onSignOut: () => window.__playbookAuth.signOut(),
         langVariant: { nl: this.state.lang === 'nl' ? 'dark' : 'ghost', en: this.state.lang === 'en' ? 'dark' : 'ghost' },
         langSidebar, chevronDownIconRef,
         onSetLangNl: () => this.setState({ lang: 'nl' }, () => this.syncUseCaseLang()),
@@ -1321,7 +1320,7 @@ class Component extends DCLogic {
         t_contactsTitle: T.contactsTitle, t_contactsFooter: T.contactsFooter,
         isHomeView: true, isToolkitView: false, isStageView: false, isUsecasesView: false, isTeamView: false,
         teamTitle: T.teamTitle, teamSubtitle: T.teamSubtitle, teamHealthTitle: T.teamHealthTitle, teamHealthNote: T.teamHealthNote, teamDiscussLabel: T.teamDiscussLabel, teamFunnelTitle: T.teamFunnelTitle, teamFunnelNote: T.teamFunnelNote, teamBoardsTitle: T.teamBoardsTitle, teamBoardsNote: T.teamBoardsNote, teamPositionTitle: T.teamPositionTitle, teamPositionNote: T.teamPositionNote, teamHealthTiles: pipelineHealth, teamFunnelTiles: [], teamBoards: [], teamPosition: [],
-        showViewerSwitcher: true, useCaseMountRef: this.mountUseCases,
+        showViewerSwitcher: false, useCaseMountRef: this.mountUseCases,
         stageCards: [], activeStageData: { title: '', blurb: '', items: [] }, toolkitTags: [],
         onBackToToolkit: () => this.setState({ view: 'toolkit' }),
         t_toolkitTitle: T.toolkitTitle, t_toolkitSub: T.toolkitSub, t_searchPlaceholder: T.searchPlaceholder,
@@ -1335,8 +1334,11 @@ class Component extends DCLogic {
     }
 
     const reps = mod.listReps().slice().sort((a, b) => a.name.localeCompare(b.name));
-    const viewerId = this.state.viewerId || 'ivo';
+    // Een rep opent zijn eigen dashboard; een manager heeft geen eigen
+    // cijfers en landt op de eerste rep uit de lijst.
+    const viewerId = this.state.viewerId || mod.getDefaultViewerId();
     const viewerMeta = reps.find((r) => r.id === viewerId) || reps[0];
+    const account = mod.getViewer();
     const snap = mod.getViewerSnapshot(viewerId, this.state.period);
     const view = this.state.view;
     const stages = T.stages;
@@ -1561,6 +1563,11 @@ class Component extends DCLogic {
       viewerInitials: initials(viewerMeta.name),
       viewerName: viewerMeta.name,
       t_repRole: T.repRole,
+      accountName: account.name,
+      accountInitials: initials(account.name),
+      accountRoleLabel: account.isManager ? T.managerRole : T.repRole,
+      t_signOut: T.signOut,
+      onSignOut: () => window.__playbookAuth.signOut(),
       greeting: `${T.hi} ${viewerMeta.name}`,
       programDayLabel: T.programDay(snap.programDay.week, snap.programDay.day, snap.programDay.cycleLen),
       pointsValue: String(snap.points),
@@ -1588,7 +1595,8 @@ class Component extends DCLogic {
       isStageView: view === 'stage',
       isUsecasesView: view === 'usecases',
       isTeamView: view === 'team',
-      showViewerSwitcher: view !== 'usecases' && view !== 'admin', useCaseMountRef: this.mountUseCases,
+      // Alleen managers kunnen wisselen; een rep ziet uitsluitend zichzelf.
+      showViewerSwitcher: account.canSwitchViewer && view !== 'usecases' && view !== 'admin', useCaseMountRef: this.mountUseCases,
       teamTitle: T.teamTitle, teamSubtitle: T.teamSubtitle, teamHealthTitle: T.teamHealthTitle, teamHealthNote: T.teamHealthNote, teamDiscussLabel: T.teamDiscussLabel, teamFunnelTitle: T.teamFunnelTitle, teamFunnelNote: T.teamFunnelNote, teamBoardsTitle: T.teamBoardsTitle, teamBoardsNote: T.teamBoardsNote, teamPositionTitle: T.teamPositionTitle, teamPositionNote: T.teamPositionNote, teamHealthTiles: pipelineHealth, teamFunnelTiles, teamBoards, teamPosition,
       stageCards: stages.map((s) => ({ icon: s.icon, iconRef: this.getIconRef(s.icon, 19), title: s.title, blurb: s.blurb, onClick: () => goStage(s.id) })),
       activeStageData,

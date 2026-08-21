@@ -1,0 +1,15 @@
+# De gedeelde samenvatting is bedoeld voor één ontvanger en hoort niet in een
+# zoekmachine. De pagina zelf krijgt straks ook <meta name="robots" content="noindex">
+# — robots.txt is een verzoek, een noindex-tag is een instructie. Allebei dus.
+#
+# /s/ is de route die de samenvattingspagina gaat gebruiken. Die pagina wordt in
+# een volgende bouwsessie gemaakt; deze regel staat er alvast zodat hij niet
+# vergeten wordt op het moment dat er echte links rondgaan.
+#
+# LET OP — op GitHub Pages onder spotlerik.github.io/playbook/ doet dit bestand
+# niets: een project-site serveert robots.txt alleen vanaf de domeinroot, en die
+# hoort bij de user-site. Zodra het playbook op een eigen (sub)domein staat werkt
+# het wel.
+
+User-agent: *
+Disallow: /s/
